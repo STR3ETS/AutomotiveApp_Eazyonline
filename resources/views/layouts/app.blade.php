@@ -59,7 +59,7 @@
                             <p class="text-sm text-white font-semibold tracking-tighter">Agenda</p>
                         </div>
                     </a>
-                    <a href="/voorraad-pipeline" class="flex items-center transition duration-300 rounded-[var(--border-radius)] hover:bg-[var(--primary-color)]/30">
+                    <a href="/pipeline" class="flex items-center transition duration-300 rounded-[var(--border-radius)] hover:bg-[var(--primary-color)]/30">
                         <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[#0d0e11]/50 transition duration-300 p-2">
                             <i class="fa-solid fa-box fa-sm text-white transition duration-300 min-w-[16px]"></i>
                             <p class="text-sm text-white font-semibold tracking-tighter">Voorraad Pipeline</p>

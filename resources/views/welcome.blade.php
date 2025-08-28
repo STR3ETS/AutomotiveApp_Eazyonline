@@ -1,7 +1,5 @@
 @extends('layouts.app')
-
+{{-- 
 @section('content')
-<div>
-    Content hier aanmaken
-</div>
-@endsection
+Hier moet het komen
+@endsection --}}
