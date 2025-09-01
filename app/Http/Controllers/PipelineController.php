@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Car;
 use App\Models\CarStage;
 use Illuminate\Http\Request;
+use App\Models\Checklist;
 
 class PipelineController extends Controller
 {
@@ -14,19 +16,19 @@ class PipelineController extends Controller
     }
 
     // Verwerk drag & drop: update stage en maak checklist-taken aan
-    public function move(\Illuminate\Http\Request $request)
+    public function move(Request $request)
     {
         $request->validate([
             'car_id' => 'required|exists:cars,id',
             'stage_id' => 'required|exists:car_stages,id',
         ]);
 
-        $car = \App\Models\Car::findOrFail($request->car_id);
+        $car = Car::findOrFail($request->car_id);
         $car->stage_id = $request->stage_id;
         $car->save();
 
         // (Optioneel) Maak checklist-taken aan voor deze fase als ze nog niet bestaan
-        $stage = \App\Models\CarStage::findOrFail($request->stage_id);
+        $stage = CarStage::findOrFail($request->stage_id);
         $defaultTasks = [
             // Vul hier per stage de standaard taken in
             'Intake' => ['Kenteken controleren', 'Sleutels ontvangen'],
@@ -37,7 +39,7 @@ class PipelineController extends Controller
         ];
         if (isset($defaultTasks[$stage->name])) {
             foreach ($defaultTasks[$stage->name] as $task) {
-                \App\Models\Checklist::firstOrCreate([
+                Checklist::firstOrCreate([
                     'car_id' => $car->id,
                     'stage_id' => $stage->id,
                     'task' => $task,

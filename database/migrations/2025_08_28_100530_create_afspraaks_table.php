@@ -11,15 +11,16 @@ return new class extends Migration
      */
 public function up(): void
 {
-    Schema::create('afspraken', function (Blueprint $table) {
-        $table->id();
-        $table->string('titel');
-        $table->dateTime('datum');
-        $table->string('klant_naam')->nullable();
-        $table->string('type')->nullable(); // proefrit, aflevering, levering onderdelen
-        $table->foreignId('auto_id')->nullable()->constrained('autos')->onDelete('cascade');
-        $table->timestamps();
-    });
+  Schema::create('afspraaks', function (Blueprint $table) {
+    $table->id();
+    $table->string('titel');
+    $table->dateTime('datum');
+    $table->string('klant_naam')->nullable();
+    $table->string('type')->nullable(); // proefrit, aflevering, levering onderdelen
+    $table->unsignedBigInteger('car_id')->nullable();
+    $table->foreign('car_id')->references('id')->on('cars')->onDelete('cascade');
+    $table->timestamps();
+});
 }
 
     /**

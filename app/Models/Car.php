@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Appointment;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Car extends Model
 {
@@ -31,4 +32,14 @@ class Car extends Model
     {
         return $this->hasMany(Checklist::class);
     }
+
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class);
+    }
+    
+    public function repairs()
+{
+    return $this->hasMany(\App\Models\Repair::class);
+}
 }
