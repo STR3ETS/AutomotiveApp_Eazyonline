@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('year');
             $table->integer('mileage');
             $table->decimal('price', 10, 2);
-            $table->enum('status', ['intake','technical','ready_for_sale','test_drive','sold']);
+            $table->string('status')->default('Intake');
             $table->timestamps();
         });
     }

@@ -14,8 +14,8 @@ class DashboardController extends Controller
     {
         // Gebruik het Car model zoals in de dashboard view
         $total = Car::count();
-        $intake = Car::where('status', 'intake')->count();
-        $readyForSale = Car::where('status', 'ready_for_sale')->count();
+        $intake = Car::where('status', 'Intake')->count();
+        $readyForSale = Car::where('status', 'Verkoop klaar')->count();
         $sold = Car::where('status', 'sold')->count();
 
         return view('dashboard.index', [
