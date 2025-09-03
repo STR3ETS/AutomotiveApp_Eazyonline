@@ -20,68 +20,68 @@
                     </span>
                 </div>
                 
-                <div class="space-y-4 flex-1">
+                <div class="flex flex-wrap gap-3 flex-1">
                     @forelse($stage->cars as $car)
                         @php
                             $completion = $car->stage_completion;
                             $canMove = $car->canMoveToNextStage();
                         @endphp
-                        <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg shadow p-4 cursor-move border border-blue-200 hover:shadow-md transition-all duration-200" 
+                        <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg shadow p-3 cursor-move border border-blue-200 hover:shadow-md transition-all duration-200 w-48 flex-shrink-0" 
                              draggable="true" 
                              @dragstart="onDragStart($event, {{ $car->id }})"
                              @dragend="onDragEnd()"
                              :class="{ 'opacity-50': draggedCarId === {{ $car->id }} }">
                             
-                            <div class="font-bold text-blue-900 mb-1">
+                            <div class="font-bold text-blue-900 mb-1 text-sm truncate">
                                 {{ $car->license_plate }} - {{ $car->brand }} {{ $car->model }}
                             </div>
                             
-                            <div class="text-sm text-blue-700 mb-2">
+                            <div class="text-xs text-blue-700 mb-2">
                                 € {{ number_format($car->price, 2, ',', '.') }}
                             </div>
                             
                             <!-- Progress Bar -->
-                            <div class="mb-3">
+                            <div class="mb-2">
                                 <div class="flex justify-between text-xs text-blue-800 mb-1">
-                                    <span>Checklist voortgang</span>
-                                    <span>{{ $completion }}%</span>
+                                    <span class="text-xs">Checklist voortgang</span>
+                                    <span class="text-xs">{{ $completion }}%</span>
                                 </div>
-                                <div class="w-full bg-blue-200 rounded-full h-2">
-                                    <div class="h-2 rounded-full transition-all duration-300 {{ $completion === 100 ? 'bg-green-500' : 'bg-blue-500' }}" 
+                                <div class="w-full bg-blue-200 rounded-full h-1.5">
+                                    <div class="h-1.5 rounded-full transition-all duration-300 {{ $completion === 100 ? 'bg-green-500' : 'bg-blue-500' }}" 
                                          style="width: {{ $completion }}%"></div>
                                 </div>
                             </div>
                             
                             <!-- Status Badge -->
                             @if($canMove)
-                                <div class="inline-flex items-center px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full mb-2">
-                                    <span class="w-2 h-2 bg-green-400 rounded-full mr-1"></span>
-                                    Klaar voor volgende fase
+                                <div class="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-green-100 text-green-800 rounded-full mb-2">
+                                    <span class="w-1.5 h-1.5 bg-green-400 rounded-full mr-1"></span>
+                                    <span class="text-xs">Klaar</span>
                                 </div>
                             @else
-                                <div class="inline-flex items-center px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full mb-2">
-                                    <span class="w-2 h-2 bg-yellow-400 rounded-full mr-1"></span>
-                                    In bewerking
+                                <div class="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full mb-2">
+                                    <span class="w-1.5 h-1.5 bg-yellow-400 rounded-full mr-1"></span>
+                                    <span class="text-xs">Bezig</span>
                                 </div>
                             @endif
                             
-                            <div class="flex justify-between items-center">
+                            <div class="flex flex-col gap-1">
                                 <div class="text-xs text-blue-800">
                                     {{ $car->checklists->where('stage_id', $stage->id)->where('is_completed', true)->count() }} / 
                                     {{ $car->checklists->where('stage_id', $stage->id)->count() }} taken voltooid
                                 </div>
                                 <a href="{{ route('pipeline.checklist', $car) }}" 
-                                   class="text-blue-600 hover:text-blue-800 text-xs font-medium hover:underline"
+                                   class="text-blue-600 hover:text-blue-800 text-xs font-medium hover:underline text-center py-1"
                                    @click.stop>
                                     Checklist →
                                 </a>
                             </div>
                         </div>
                     @empty
-                        <div class="text-gray-400 text-center py-12 border-2 border-dashed border-gray-200 rounded-lg">
+                        <div class="text-gray-400 text-center py-8 border-2 border-dashed border-gray-200 rounded-lg w-full">
                             <div class="text-lg mb-2">📋</div>
-                            <div>Geen auto's in deze fase</div>
-                            <div class="text-sm">Sleep een auto hiernaartoe</div>
+                            <div class="text-sm">Geen auto's in deze fase</div>
+                            <div class="text-xs">Sleep een auto hiernaartoe</div>
                         </div>
                     @endforelse
                 </div>
