@@ -23,5 +23,6 @@ class DatabaseSeeder extends Seeder
         // Seed car_stages
         $this->call(\Database\Seeders\CarStagesTableSeeder::class);
         $this->call(\Database\Seeders\CarsTableSeeder::class);
+        $this->call(\Database\Seeders\ChecklistSeeder::class);
     }
 }
