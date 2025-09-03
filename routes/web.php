@@ -12,6 +12,9 @@ Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::resource('autos', AutoController::class);
 Route::get('/pipeline', [PipelineController::class, 'index'])->name('pipeline.index');
 Route::post('/pipeline/move', [PipelineController::class, 'move'])->name('pipeline.move');
+Route::get('/pipeline/checklist/{car}', [PipelineController::class, 'checklist'])->name('pipeline.checklist');
+Route::post('/pipeline/checklist/{car}/toggle', [PipelineController::class, 'toggleChecklistItem'])->name('pipeline.checklist.toggle');
+Route::post('/pipeline/checklist/{car}/add-task', [PipelineController::class, 'addTask'])->name('pipeline.checklist.add-task');
 
 Route::get('/agenda', [AgendaController::class, 'index'])->name('agenda.index');
 Route::post('/agenda', [AgendaController::class, 'store'])->name('agenda.store');
