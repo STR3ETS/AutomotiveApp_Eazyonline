@@ -27,6 +27,22 @@ class Car extends Model
         'stage_id',
     ];
 
+    // Boot method to ensure status matches stage
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::saving(function ($car) {
+            // Als stage_id is gezet, update status naar stage naam
+            if ($car->stage_id && $car->isDirty('stage_id')) {
+                $stage = CarStage::find($car->stage_id);
+                if ($stage) {
+                    $car->status = $stage->name;
+                }
+            }
+        });
+    }
+
     public function stage()
     {
         return $this->belongsTo(CarStage::class, 'stage_id');

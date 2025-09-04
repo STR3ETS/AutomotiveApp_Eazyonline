@@ -159,13 +159,46 @@ function pipelineDrag() {
                 const data = await response.json();
                 
                 if (data.success) {
+                    // Toon success bericht
+                    if (data.message) {
+                        // Voeg een tijdelijke success melding toe
+                        const successDiv = document.createElement('div');
+                        successDiv.className = 'fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50';
+                        successDiv.innerHTML = `<i class="fa-solid fa-check-circle mr-2"></i>${data.message}`;
+                        document.body.appendChild(successDiv);
+                        
+                        // Verwijder melding na 3 seconden
+                        setTimeout(() => {
+                            successDiv.remove();
+                        }, 3000);
+                    }
+                    
+                    // Herlaad de pagina om de nieuwe positie te tonen
                     window.location.reload();
                 } else {
-                    alert(data.message || 'Er is een fout opgetreden bij het verplaatsen van de auto.');
+                    // Toon error bericht in een mooie modal
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50 max-w-md';
+                    errorDiv.innerHTML = `<i class="fa-solid fa-exclamation-circle mr-2"></i>${data.message}`;
+                    document.body.appendChild(errorDiv);
+                    
+                    // Verwijder melding na 5 seconden
+                    setTimeout(() => {
+                        errorDiv.remove();
+                    }, 5000);
                 }
             } catch (error) {
                 console.error('Error moving car:', error);
-                alert('Er is een fout opgetreden bij het verplaatsen van de auto.');
+                
+                // Toon error bericht
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50';
+                errorDiv.innerHTML = '<i class="fa-solid fa-exclamation-circle mr-2"></i>Er is een fout opgetreden bij het verplaatsen van de auto.';
+                document.body.appendChild(errorDiv);
+                
+                setTimeout(() => {
+                    errorDiv.remove();
+                }, 5000);
             }
             
             this.draggedCarId = null;

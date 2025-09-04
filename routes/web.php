@@ -10,6 +10,8 @@ use App\Http\Controllers\RepairController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SalesReadyController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ActiveSalesController;
+use App\Http\Controllers\ReportsController;
 
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::resource('autos', AutoController::class);
@@ -34,8 +36,11 @@ Route::put('/parts/{part}', [RepairController::class, 'updatePart'])->name('part
 Route::resource('sales', SalesController::class);
 Route::post('/sales/{sale}/deliver', [SalesController::class, 'markAsDelivered'])->name('sales.deliver');
 Route::post('/sales/{sale}/cancel', [SalesController::class, 'cancel'])->name('sales.cancel');
-Route::put('/sales/checklist/{item}', [SalesController::class, 'toggleChecklistItem'])->name('sales.checklist.toggle');
 
 Route::get('/verkoop-klaar', [SalesReadyController::class, 'index'])->name('sales-ready.index');
 
 Route::resource('customers', CustomerController::class);
+
+Route::get('/actieve-verkoop', [ActiveSalesController::class, 'index'])->name('active-sales.index');
+
+Route::get('/rapportage', [ReportsController::class, 'index'])->name('reports.index');

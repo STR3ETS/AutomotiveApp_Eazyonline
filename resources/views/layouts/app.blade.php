@@ -66,6 +66,12 @@
                             <p class="text-sm text-white font-semibold tracking-tighter">Voorraad Pipeline</p>
                         </div>
                     </a>
+                    <a href="{{ route('autos.index') }}" class="flex items-center transition duration-300 rounded-[var(--border-radius)] hover:bg-[var(--primary-color)]/30">
+                        <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[#0d0e11]/50 transition duration-300 p-2">
+                            <i class="fa-solid fa-car fa-sm text-white transition duration-300 min-w-[16px]"></i>
+                            <p class="text-sm text-white font-semibold tracking-tighter">Auto Beheer</p>
+                        </div>
+                    </a>
                     <a href="/repairs" class="flex items-center transition duration-300 rounded-[var(--border-radius)] hover:bg-[var(--primary-color)]/30">
                         <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[#0d0e11]/50 transition duration-300 p-2">
                             <i class="fa-solid fa-wrench fa-sm text-white transition duration-300 min-w-[16px]"></i>
@@ -84,13 +90,19 @@
                             <p class="text-sm text-white font-semibold tracking-tighter">Klanten</p>
                         </div>
                     </a>
-                    <a href="/klaar-voor-oplevering" class="flex items-center transition duration-300 rounded-[var(--border-radius)] hover:bg-[var(--primary-color)]/30">
+                    <a href="{{ route('active-sales.index') }}" class="flex items-center transition duration-300 rounded-[var(--border-radius)] hover:bg-[var(--primary-color)]/30">
+                        <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[#0d0e11]/50 transition duration-300 p-2">
+                            <i class="fa-solid fa-handshake fa-sm text-white transition duration-300 min-w-[16px]"></i>
+                            <p class="text-sm text-white font-semibold tracking-tighter">Klaar voor Oplevering</p>
+                        </div>
+                    </a>
+                    {{-- <a href="/klaar-voor-oplevering" class="flex items-center transition duration-300 rounded-[var(--border-radius)] hover:bg-[var(--primary-color)]/30">
                         <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[#0d0e11]/50 transition duration-300 p-2">
                             <i class="fa-solid fa-flag-checkered fa-sm text-white transition duration-300 min-w-[16px]"></i>
                             <p class="text-sm text-white font-semibold tracking-tighter">Klaar voor Oplevering</p>
                         </div>
-                    </a>
-                    <a href="/rapportage" class="flex items-center transition duration-300 rounded-[var(--border-radius)] hover:bg-[var(--primary-color)]/30">
+                    </a> --}}
+                    <a href="{{ route('reports.index') }}" class="flex items-center transition duration-300 rounded-[var(--border-radius)] hover:bg-[var(--primary-color)]/30">
                         <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[#0d0e11]/50 transition duration-300 p-2">
                             <i class="fa-solid fa-clipboard fa-sm text-white transition duration-300 min-w-[16px]"></i>
                             <p class="text-sm text-white font-semibold tracking-tighter">Rapportage</p>
@@ -114,7 +126,7 @@
                     Dag Maand Jaar van vandaag
                 </h4>
             </div>
-            <div class="flex-1 bg-red-500">
+            <div class="flex-1">
                 @yield('content')
             </div>
         </div>
