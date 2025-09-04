@@ -78,6 +78,12 @@
                             <p class="text-sm text-white font-semibold tracking-tighter">Verkoop Klaar</p>
                         </div>
                     </a>
+                    <a href="{{ route('customers.index') }}" class="flex items-center transition duration-300 rounded-[var(--border-radius)] hover:bg-[var(--primary-color)]/30">
+                        <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[#0d0e11]/50 transition duration-300 p-2">
+                            <i class="fa-solid fa-users fa-sm text-white transition duration-300 min-w-[16px]"></i>
+                            <p class="text-sm text-white font-semibold tracking-tighter">Klanten</p>
+                        </div>
+                    </a>
                     <a href="/klaar-voor-oplevering" class="flex items-center transition duration-300 rounded-[var(--border-radius)] hover:bg-[var(--primary-color)]/30">
                         <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[#0d0e11]/50 transition duration-300 p-2">
                             <i class="fa-solid fa-flag-checkered fa-sm text-white transition duration-300 min-w-[16px]"></i>

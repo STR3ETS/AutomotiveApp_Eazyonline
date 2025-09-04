@@ -14,7 +14,7 @@
             <label class="block text-xs font-semibold mb-1">Auto</label>
             <select name="car_id" class="border rounded p-2" required>
                 <option value="">Kies auto...</option>
-                @foreach(\App\Models\Car::all() as $car)
+                @foreach($cars as $car)
                     <option value="{{ $car->id }}">{{ $car->license_plate ?? $car->kenteken }} - {{ $car->brand ?? $car->merk }} {{ $car->model }}</option>
                 @endforeach
             </select>
@@ -36,8 +36,18 @@
             <input type="time" name="time" class="border rounded p-2" required>
         </div>
         <div>
-            <label class="block text-xs font-semibold mb-1">Klantnaam</label>
-            <input type="text" name="customer_name" class="border rounded p-2" required>
+            <label class="block text-xs font-semibold mb-1">Klant</label>
+            <select name="customer_id" id="customer_select" class="border rounded p-2" onchange="toggleCustomerInput()">
+                <option value="">Bestaande klant...</option>
+                @foreach($customers as $customer)
+                    <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                @endforeach
+                <option value="new">+ Nieuwe klant</option>
+            </select>
+        </div>
+        <div id="new_customer_input" style="display: none;">
+            <label class="block text-xs font-semibold mb-1">Nieuwe klant naam</label>
+            <input type="text" name="customer_name" class="border rounded p-2">
         </div>
         <div class="flex-1">
             <label class="block text-xs font-semibold mb-1">Notities</label>
@@ -56,7 +66,9 @@
                     {{ ucfirst($appointment->type) }}
                 </span>
                 <span class="w-28 text-sm text-gray-700">{{ $appointment->date }} {{ \Carbon\Carbon::parse($appointment->time)->format("H:i") }}</span>
-                <span class="w-40 text-sm text-gray-900 font-semibold">{{ $appointment->customer_name }}</span>
+                <span class="w-40 text-sm text-gray-900 font-semibold">
+                    {{ $appointment->customer ? $appointment->customer->name : $appointment->customer_name }}
+                </span>
                 <span class="w-56 text-sm text-gray-600">
                     @if($appointment->car)
                         {{ $appointment->car->license_plate ?? $appointment->car->kenteken }} - {{ $appointment->car->brand ?? $appointment->car->merk }} {{ $appointment->car->model }}
@@ -75,4 +87,21 @@
         @endforelse
     </div>
 </div>
+
+<script>
+function toggleCustomerInput() {
+    const select = document.getElementById('customer_select');
+    const newCustomerInput = document.getElementById('new_customer_input');
+    const customerNameInput = document.querySelector('input[name="customer_name"]');
+    
+    if (select.value === 'new') {
+        newCustomerInput.style.display = 'block';
+        customerNameInput.required = true;
+    } else {
+        newCustomerInput.style.display = 'none';
+        customerNameInput.required = false;
+        customerNameInput.value = '';
+    }
+}
+</script>
 @endsection

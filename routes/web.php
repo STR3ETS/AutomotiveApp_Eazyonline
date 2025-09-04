@@ -9,6 +9,7 @@ use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\RepairController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SalesReadyController;
+use App\Http\Controllers\CustomerController;
 
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::resource('autos', AutoController::class);
@@ -36,3 +37,5 @@ Route::post('/sales/{sale}/cancel', [SalesController::class, 'cancel'])->name('s
 Route::put('/sales/checklist/{item}', [SalesController::class, 'toggleChecklistItem'])->name('sales.checklist.toggle');
 
 Route::get('/verkoop-klaar', [SalesReadyController::class, 'index'])->name('sales-ready.index');
+
+Route::resource('customers', CustomerController::class);
