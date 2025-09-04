@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Car;
 use App\Models\Part;
 use App\Models\Repair;
+use App\Models\CarStage;
+use App\Models\Checklist;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Log;
 
 class RepairController extends Controller
 {
@@ -39,9 +42,50 @@ $cars = Car::orderBy('id', 'desc')->get(['id', 'license_plate', 'brand', 'model'
             'cost_estimate'=> ['nullable', 'numeric', 'min:0'],
         ]);
 
-        Repair::create($data);
+        $repair = Repair::create($data);
+        
+        // Handel auto stage logica af
+        $this->handleCarStageForRepair($repair);
 
         return redirect()->route('repairs.index')->with('success', 'Reparatie aangemaakt.');
+    }
+    
+    /**
+     * Handel de auto stage logica af wanneer een reparatie wordt toegevoegd
+     */
+    private function handleCarStageForRepair(Repair $repair)
+    {
+        $car = $repair->car;
+        $repairStage = CarStage::where('name', 'Herstel & Onderhoud')->first();
+        
+        if (!$repairStage) {
+            Log::warning('Herstel & Onderhoud stage niet gevonden');
+            return;
+        }
+        
+        // Als de auto in een hogere stage staat dan "Herstel & Onderhoud", zet hem terug
+        if ($car->stage && $car->stage->order > $repairStage->order) {
+            $car->update(['stage_id' => $repairStage->id]);
+            Log::info("Auto {$car->license_plate} teruggeplaatst naar Herstel & Onderhoud vanwege nieuwe reparatie");
+        }
+        
+        // Controleer of er al een checklist item bestaat voor deze reparatie
+        $existingChecklist = Checklist::where([
+            'car_id' => $car->id,
+            'stage_id' => $repairStage->id,
+            'repair_id' => $repair->id
+        ])->first();
+        
+        if (!$existingChecklist) {
+            // Voeg checklist item toe aan "Herstel & Onderhoud" stage
+            Checklist::create([
+                'car_id' => $car->id,
+                'stage_id' => $repairStage->id,
+                'task' => 'Reparatie: ' . $repair->description,
+                'is_completed' => false,
+                'repair_id' => $repair->id
+            ]);
+        }
     }
 
     /**

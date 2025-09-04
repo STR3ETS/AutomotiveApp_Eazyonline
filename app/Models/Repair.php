@@ -24,6 +24,11 @@ class Repair extends Model
     {
         return $this->hasMany(Part::class);
     }
+    
+    public function checklist()
+    {
+        return $this->hasOne(Checklist::class);
+    }
 
     // Handige accessor: totale onderdelenkosten
     public function getPartsTotalAttribute(): float

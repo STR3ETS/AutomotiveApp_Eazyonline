@@ -9,7 +9,7 @@ class Checklist extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['car_id', 'stage_id', 'task', 'is_completed'];
+    protected $fillable = ['car_id', 'stage_id', 'task', 'is_completed', 'repair_id'];
 
     public function car()
     {
@@ -19,5 +19,10 @@ class Checklist extends Model
     public function stage()
     {
         return $this->belongsTo(CarStage::class, 'stage_id');
+    }
+    
+    public function repair()
+    {
+        return $this->belongsTo(Repair::class);
     }
 }

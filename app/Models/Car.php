@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
+use App\Models\Sale;
+use App\Models\Repair;
 use App\Models\Appointment;
+use App\Models\CarStageTransition;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Carbon\Carbon;
-use App\Models\CarStageTransition;
 
 class Car extends Model
 {
@@ -71,11 +73,11 @@ class Car extends Model
 
     public function repairs()
     {
-        return $this->hasMany(\App\Models\Repair::class);
+        return $this->hasMany(Repair::class);
     }
     public function sales()
     {
-        return $this->hasMany(\App\Models\Sale::class);
+        return $this->hasMany(Sale::class);
     }
 
     protected $casts = [

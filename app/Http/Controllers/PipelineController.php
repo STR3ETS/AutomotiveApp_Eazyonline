@@ -21,7 +21,7 @@ class PipelineController extends Controller
         }
         
         // Zorg ook dat auto's die niet in een specifieke stage staan, toch checklists hebben
-        $allCars = \App\Models\Car::all();
+        $allCars = Car::all();
         foreach ($allCars as $car) {
             foreach ($stages as $stage) {
                 $this->ensureChecklistsExist($car, $stage);
@@ -130,6 +130,15 @@ class PipelineController extends Controller
         $checklist->update([
             'is_completed' => $request->is_completed
         ]);
+        
+        // Als deze checklist gekoppeld is aan een reparatie en wordt afgevinkt, 
+        // zet de reparatie op "gereed"
+        if ($checklist->repair_id && $request->is_completed) {
+            $repair = $checklist->repair;
+            if ($repair && $repair->status !== 'gereed') {
+                $repair->update(['status' => 'gereed']);
+            }
+        }
 
         $car = $checklist->car;
         $completion = $car->stage_completion;
