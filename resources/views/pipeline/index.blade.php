@@ -1,24 +1,32 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-full mx-auto py-10 px-4">
-    <h1 class="text-3xl font-bold mb-8 text-gray-900">Voorraad Pipeline</h1>
-    <div class="grid grid-cols-1 md:grid-cols-{{ count($stages) }} gap-6" x-data="pipelineDrag()">
-        @foreach($stages as $stage)
-            <div class="bg-white rounded-xl shadow-lg p-4 min-h-[400px] border border-gray-100 flex flex-col" 
-                 x-data="{ stageId: {{ $stage->id }} }" 
-                 @dragover.prevent 
-                 @drop="onDrop($event, stageId)"
-                 :class="{ 'ring-2 ring-blue-300 bg-blue-50': draggedCarId && hoveredStage === stageId }"
-                 @dragenter="hoveredStage = stageId"
-                 @dragleave="if ($event.target === $el) hoveredStage = null">
-                
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="font-semibold text-lg text-blue-700">{{ $stage->name }}</h2>
-                    <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                        {{ $stage->cars->count() }}
-                    </span>
-                </div>
+<div class="bg-gray-50 min-h-full">
+    <div class="max-w-full mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">🏭 Voorraad Pipeline</h1>
+            <p class="text-gray-600">Sleep auto's tussen de verschillende fases om je voorraad te beheren</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-{{ count($stages) }} gap-6" x-data="pipelineDrag()">
+            @foreach($stages as $stage)
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 min-h-[500px] flex flex-col hover-stage" 
+                     x-data="{ stageId: {{ $stage->id }} }" 
+                     @dragover.prevent 
+                     @drop="onDrop($event, stageId)"
+                     :class="{ 'ring-2 ring-blue-300 bg-blue-50 transform scale-105': draggedCarId && hoveredStage === stageId }"
+                     @dragenter="hoveredStage = stageId"
+                     @dragleave="if ($event.target === $el) hoveredStage = null">
+                    
+                    <div class="flex items-center justify-between mb-6 p-2">
+                        <h2 class="font-bold text-lg text-gray-800">{{ $stage->name }}</h2>
+                        <div class="flex items-center gap-2">
+                            <span class="bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full shadow-sm">
+                                {{ $stage->cars->count() }} auto's
+                            </span>
+                        </div>
+                    </div>
                 
                 <div class="flex flex-wrap gap-3 flex-1">
                     @forelse($stage->cars as $car)
@@ -26,62 +34,77 @@
                             $completion = $car->stage_completion;
                             $canMove = $car->canMoveToNextStage();
                         @endphp
-                        <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg shadow p-3 cursor-move border border-blue-200 hover:shadow-md transition-all duration-200 w-48 flex-shrink-0" 
+                        <div class="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-sm p-4 cursor-move border border-gray-200 hover:shadow-lg hover:border-blue-300 transition-all duration-300 w-full sm:w-64 flex-shrink-0 car-card" 
                              draggable="true" 
                              @dragstart="onDragStart($event, {{ $car->id }})"
                              @dragend="onDragEnd()"
-                             :class="{ 'opacity-50': draggedCarId === {{ $car->id }} }">
+                             :class="{ 'opacity-50 transform rotate-3': draggedCarId === {{ $car->id }} }">
                             
-                            <div class="font-bold text-blue-900 mb-1 text-sm truncate">
-                                {{ $car->license_plate }} - {{ $car->brand }} {{ $car->model }}
-                            </div>
-                            
-                            <div class="text-xs text-blue-700 mb-2">
-                                € {{ number_format($car->price, 2, ',', '.') }}
-                            </div>
-                            
-                            <!-- Progress Bar -->
-                            <div class="mb-2">
-                                <div class="flex justify-between text-xs text-blue-800 mb-1">
-                                    <span class="text-xs">Checklist voortgang</span>
-                                    <span class="text-xs">{{ $completion }}%</span>
+                            <!-- Car Header -->
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 bg-gradient-to-r from-blue-100 to-blue-200 rounded-full flex items-center justify-center">
+                                    <i class="fa-solid fa-car text-blue-600"></i>
                                 </div>
-                                <div class="w-full bg-blue-200 rounded-full h-1.5">
-                                    <div class="h-1.5 rounded-full transition-all duration-300 {{ $completion === 100 ? 'bg-green-500' : 'bg-blue-500' }}" 
+                                <div class="flex-1">
+                                    <div class="font-bold text-gray-900 text-sm truncate">
+                                        {{ $car->license_plate }}
+                                    </div>
+                                    <div class="text-xs text-gray-600">
+                                        {{ $car->brand }} {{ $car->model }}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Price -->
+                            <div class="mb-3">
+                                <div class="text-lg font-bold text-green-600">
+                                    €{{ number_format($car->price, 0, ',', '.') }}
+                                </div>
+                            </div>
+                            
+                            <!-- Progress Section -->
+                            <div class="mb-4">
+                                <div class="flex justify-between text-xs font-medium text-gray-700 mb-2">
+                                    <span>Checklist voortgang</span>
+                                    <span class="text-blue-600">{{ $completion }}%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                                    <div class="h-2 rounded-full transition-all duration-500 {{ $completion === 100 ? 'bg-gradient-to-r from-green-400 to-green-500' : 'bg-gradient-to-r from-blue-400 to-blue-500' }}" 
                                          style="width: {{ $completion }}%"></div>
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">
+                                    {{ $car->checklists->where('stage_id', $stage->id)->where('is_completed', true)->count() }} / 
+                                    {{ $car->checklists->where('stage_id', $stage->id)->count() }} taken voltooid
                                 </div>
                             </div>
                             
                             <!-- Status Badge -->
-                            @if($canMove)
-                                <div class="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-green-100 text-green-800 rounded-full mb-2">
-                                    <span class="w-1.5 h-1.5 bg-green-400 rounded-full mr-1"></span>
-                                    <span class="text-xs">Klaar</span>
-                                </div>
-                            @else
-                                <div class="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full mb-2">
-                                    <span class="w-1.5 h-1.5 bg-yellow-400 rounded-full mr-1"></span>
-                                    <span class="text-xs">Bezig</span>
-                                </div>
-                            @endif
-                            
-                            <div class="flex flex-col gap-1">
-                                <div class="text-xs text-blue-800">
-                                    {{ $car->checklists->where('stage_id', $stage->id)->where('is_completed', true)->count() }} / 
-                                    {{ $car->checklists->where('stage_id', $stage->id)->count() }} taken voltooid
-                                </div>
+                            <div class="flex justify-between items-center">
+                                @if($canMove)
+                                    <div class="inline-flex items-center px-2 py-1 text-xs font-semibold bg-gradient-to-r from-green-100 to-green-200 text-green-800 rounded-full">
+                                        <span class="w-2 h-2 bg-green-500 rounded-full mr-1"></span>
+                                        Klaar voor volgende fase
+                                    </div>
+                                @else
+                                    <div class="inline-flex items-center px-2 py-1 text-xs font-semibold bg-gradient-to-r from-yellow-100 to-orange-200 text-orange-800 rounded-full">
+                                        <span class="w-2 h-2 bg-orange-500 rounded-full mr-1"></span>
+                                        In bewerking
+                                    </div>
+                                @endif
+                                
                                 <a href="{{ route('pipeline.checklist', $car) }}" 
-                                   class="text-blue-600 hover:text-blue-800 text-xs font-medium hover:underline text-center py-1"
+                                   class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-200 transition-all duration-200"
                                    @click.stop>
-                                    Checklist →
+                                    <i class="fa-solid fa-list-check mr-1"></i>
+                                    Checklist
                                 </a>
                             </div>
                         </div>
                     @empty
-                        <div class="text-gray-400 text-center py-8 border-2 border-dashed border-gray-200 rounded-lg w-full">
-                            <div class="text-lg mb-2">📋</div>
-                            <div class="text-sm">Geen auto's in deze fase</div>
-                            <div class="text-xs">Sleep een auto hiernaartoe</div>
+                        <div class="text-gray-400 text-center py-16 border-2 border-dashed border-gray-200 rounded-xl w-full hover:border-gray-300 transition-colors duration-300">
+                            <div class="text-4xl mb-3">📋</div>
+                            <div class="text-sm font-medium text-gray-600 mb-1">Geen auto's in deze fase</div>
+                            <div class="text-xs text-gray-500">Sleep een auto hiernaartoe om te beginnen</div>
                         </div>
                     @endforelse
                 </div>
@@ -89,6 +112,82 @@
         @endforeach
     </div>
 </div>
+
+<style>
+/* Custom animations */
+@keyframes slideInDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideInUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(1deg); }
+    75% { transform: rotate(-1deg); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Stage column animations */
+.hover-stage {
+    animation: slideInDown 0.6s ease-out;
+}
+
+.hover-stage:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+/* Car card animations */
+.car-card {
+    animation: slideInUp 0.5s ease-out;
+}
+
+.car-card:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Drag effects */
+.car-card[draggable="true"]:active {
+    animation: wiggle 0.2s ease-in-out infinite;
+}
+
+/* Staggered animations */
+.hover-stage:nth-child(1) { animation-delay: 0.1s; }
+.hover-stage:nth-child(2) { animation-delay: 0.2s; }
+.hover-stage:nth-child(3) { animation-delay: 0.3s; }
+.hover-stage:nth-child(4) { animation-delay: 0.4s; }
+.hover-stage:nth-child(5) { animation-delay: 0.5s; }
+
+.car-card:nth-child(odd) { animation-delay: 0.1s; }
+.car-card:nth-child(even) { animation-delay: 0.15s; }
+
+/* Progress bar animation */
+.car-card .h-2 {
+    transition: width 0.8s ease-in-out;
+}
+
+/* Success/Error message styling */
+.fixed.top-4.right-4 {
+    animation: slideInDown 0.3s ease-out;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Drag hover effects */
+.ring-2.ring-blue-300 {
+    animation: pulse 1s ease-in-out infinite;
+}
+</style>
 
 <script>
 function pipelineDrag() {

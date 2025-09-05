@@ -1,83 +1,100 @@
-@extends('layouts.app') {{-- of je eigen layout --}}
+@extends('layouts.app')
 @section('content')
-<div class="max-w-7xl mx-auto p-6">
-    {{-- Flash messages --}}
-    @if(session('success'))
-        <div class="mb-4 rounded-md bg-green-50 p-4 text-green-700">
-            {{ session('success') }}
+<div class="bg-gray-50 min-h-full">
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">🔧 Werkplaats — Reparaties</h1>
+            <p class="text-gray-600">Beheer alle reparaties en onderhoudswerkzaamheden</p>
         </div>
-    @endif
-    @if ($errors->any())
-        <div class="mb-4 rounded-md bg-red-50 p-4 text-red-700">
-            <ul class="list-disc pl-5 space-y-1">
-                @foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach
-            </ul>
+
+        {{-- Flash messages --}}
+        @if(session('success'))
+            <div class="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-xl flex items-center">
+                <i class="fa-solid fa-check-circle mr-2"></i>
+                {{ session('success') }}
+            </div>
+        @endif
+        @if ($errors->any())
+            <div class="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-xl">
+                <div class="flex items-center mb-2">
+                    <i class="fa-solid fa-exclamation-circle mr-2"></i>
+                    <span class="font-semibold">Er zijn fouten opgetreden:</span>
+                </div>
+                <ul class="list-disc pl-5 space-y-1">
+                    @foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach
+                </ul>
+            </div>
+        @endif
+
+        {{-- Nieuw: reparatie toevoegen --}}
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8 hover-card">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fa-solid fa-plus-circle text-blue-600 mr-2"></i>
+                Nieuwe reparatie
+            </h2>
+
+            <form method="POST" action="{{ route('repairs.store') }}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                @csrf
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Auto</label>
+                    <select name="car_id" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                        <option value="">— Kies auto —</option>
+                        @foreach($cars as $car)
+                            <option value="{{ $car->id }}">
+                                {{ $car->license_plate ?? '—' }} — {{ $car->brand ?? '' }} {{ $car->model ?? '' }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Omschrijving</label>
+                    <input type="text" name="description" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" placeholder="Bijv. Remblokken vervangen, APK, olie + filter" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                    <select name="status" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                        <option value="gepland">📅 Gepland</option>
+                        <option value="bezig">🔧 Bezig</option>
+                        <option value="wachten_op_onderdeel">⏳ Wachten op onderdeel</option>
+                        <option value="gereed">✅ Gereed</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Kostenraming (€)</label>
+                    <input type="number" step="0.01" min="0" name="cost_estimate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" placeholder="Bijv. 249.95" />
+                </div>
+
+                <div class="md:col-span-3"></div>
+
+                <div class="text-right">
+                    <button class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-2 rounded-lg font-semibold transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-save"></i>
+                        Reparatie Opslaan
+                    </button>
+                </div>
+            </form>
         </div>
-    @endif
 
-    <h1 class="text-2xl font-bold mb-6">Werkplaats — Reparaties</h1>
-
-    {{-- Nieuw: reparatie toevoegen --}}
-    <div class="bg-white rounded-xl shadow p-5 mb-8">
-        <h2 class="text-lg font-semibold mb-4">Nieuwe reparatie</h2>
-
-        <form method="POST" action="{{ route('repairs.store') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            @csrf
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Auto</label>
-                <select name="car_id" required class="w-full rounded-lg border-gray-300">
-                    <option value="">— Kies auto —</option>
-                    @foreach($cars as $car)
-                        <option value="{{ $car->id }}">
-                            {{-- Pas velden aan je Car-model aan --}}
-                            {{ $car->license_plate ?? '—' }} — {{ $car->brand ?? '' }} {{ $car->model ?? '' }}
-                        </option>
-                    @endforeach
-                </select>
+        {{-- Overzicht alle reparaties --}}
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover-card">
+            <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900">📋 Alle Reparaties</h2>
             </div>
-
-            <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Omschrijving</label>
-                <input type="text" name="description" required class="w-full rounded-lg border-gray-300" placeholder="Bijv. Remblokken vervangen, APK, olie + filter" />
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <select name="status" required class="w-full rounded-lg border-gray-300">
-                    <option value="gepland">Gepland</option>
-                    <option value="bezig">Bezig</option>
-                    <option value="wachten_op_onderdeel">Wachten op onderdeel</option>
-                    <option value="gereed">Gereed</option>
-                </select>
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1 mt-2 md:mt-0">Kostenraming (€)</label>
-                <input type="number" step="0.01" min="0" name="cost_estimate" class="w-full rounded-lg border-gray-300" placeholder="Bijv. 249.95" />
-            </div>
-
-            <div class="md:col-span-3"></div>
-
-            <div class="md:col-span-1 text-right">
-                <button class="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                    Opslaan
-                </button>
-            </div>
-        </form>
-    </div>
-
-    {{-- Overzicht alle reparaties --}}
-    <div class="bg-white rounded-xl shadow overflow-hidden">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Auto</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Omschrijving</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Raming (€)</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Onderdelen</th>
-                    <th class="px-4 py-3"></th>
-                </tr>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Auto</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Omschrijving</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Raming (€)</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Onderdelen</th>
+                            <th class="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Acties</th>
+                        </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-100">
                 @forelse($repairs as $repair)
@@ -190,20 +207,89 @@
                                 </form>
                             </div>
                         </td>
-                        <td class="px-4 py-3 align-top text-right">
+                        <td class="px-6 py-4 align-top text-center">
                             <form method="POST" action="{{ route('repairs.destroy', $repair) }}" onsubmit="return confirm('Weet je zeker dat je deze reparatie wilt verwijderen?');">
                                 @csrf @method('DELETE')
-                                <button class="inline-flex items-center text-red-600 hover:text-red-700">Verwijderen</button>
+                                <button class="inline-flex items-center px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium hover:bg-red-200 transition-all duration-200">
+                                    <i class="fa-solid fa-trash mr-1"></i>
+                                    Verwijderen
+                                </button>
                             </form>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="px-4 py-6 text-center text-gray-500">Er zijn nog geen reparaties.</td>
+                        <td colspan="6" class="px-6 py-12 text-center">
+                            <div class="text-6xl mb-4">🔧</div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Nog geen reparaties</h3>
+                            <p class="text-gray-600">Voeg je eerste reparatie toe om te beginnen.</p>
+                        </td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
 </div>
+</div>
+
+<style>
+/* Custom animations */
+@keyframes slideIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeInUp {
+    from { 
+        transform: translateY(30px); 
+        opacity: 0; 
+    }
+    to { 
+        transform: translateY(0); 
+        opacity: 1; 
+    }
+}
+
+.hover-card {
+    animation: slideIn 0.5s ease-out;
+}
+
+/* Hover effects */
+.hover-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+/* Table row animations */
+tbody tr {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+tbody tr:nth-child(odd) { animation-delay: 0.05s; }
+tbody tr:nth-child(even) { animation-delay: 0.1s; }
+
+/* Hover effects for table rows */
+tbody tr:hover {
+    background: linear-gradient(to right, rgb(239 246 255), rgb(238 242 255));
+    transform: scale(1.01);
+    transition: all 0.2s ease;
+}
+
+/* Form elements animations */
+.hover-card form input,
+.hover-card form select {
+    transition: all 0.2s ease;
+}
+
+.hover-card form input:focus,
+.hover-card form select:focus {
+    transform: scale(1.02);
+}
+
+/* Staggered animation delay */
+.hover-card:nth-child(1) { animation-delay: 0.1s; }
+.hover-card:nth-child(2) { animation-delay: 0.2s; }
+.hover-card:nth-child(3) { animation-delay: 0.3s; }
+</style>
 @endsection

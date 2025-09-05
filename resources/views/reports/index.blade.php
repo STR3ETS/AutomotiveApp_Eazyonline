@@ -261,7 +261,7 @@
             <h3 class="text-lg font-semibold text-gray-900 mb-4">✅ Fase Voltooiing Overzicht</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 @foreach($pipelineData['completion_rates'] as $stage)
-                    <div class="border rounded-lg p-4">
+                    <div class=" rounded-lg p-4">
                         <div class="flex justify-between items-center mb-2">
                             <h4 class="font-medium text-gray-900">{{ $stage['stage'] }}</h4>
                             <span class="text-sm font-bold text-gray-600">{{ $stage['completion_rate'] }}%</span>

@@ -32,35 +32,40 @@
         @endif
 
         <!-- Filters -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 hover-card">
             <form method="GET" action="{{ route('sales.index') }}" class="flex flex-wrap gap-4">
                 <div class="flex-1 min-w-64">
-                    <input type="text" 
-                           name="search" 
-                           value="{{ request('search') }}"
-                           placeholder="Zoek op kenteken, merk, model of klant..." 
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-search text-gray-400"></i>
+                        </div>
+                        <input type="text" 
+                               name="search" 
+                               value="{{ request('search') }}"
+                               placeholder="Zoek op kenteken, merk, model of klant..." 
+                               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                    </div>
                 </div>
-                <select name="status" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <select name="status" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
                     <option value="">Alle statussen</option>
                     <option value="option" {{ request('status') == 'option' ? 'selected' : '' }}>📝 Optie</option>
                     <option value="contract_signed" {{ request('status') == 'contract_signed' ? 'selected' : '' }}>📋 Contract getekend</option>
                     <option value="ready_for_delivery" {{ request('status') == 'ready_for_delivery' ? 'selected' : '' }}>🚀 Klaar voor levering</option>
                 </select>
-                <select name="payment_status" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <select name="payment_status" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
                     <option value="">Alle betalingen</option>
                     <option value="open" {{ request('payment_status') == 'open' ? 'selected' : '' }}>🔍 Open</option>
                     <option value="deposit_paid" {{ request('payment_status') == 'deposit_paid' ? 'selected' : '' }}>💳 Aanbetaling</option>
                     <option value="paid" {{ request('payment_status') == 'paid' ? 'selected' : '' }}>💰 Volledig betaald</option>
                 </select>
                 <button type="submit" 
-                        class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition duration-200">
-                    <i class="fa-solid fa-search mr-2"></i>Zoeken
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition duration-200 flex items-center gap-2 shadow-sm hover:shadow-md">
+                    <i class="fa-solid fa-search"></i>Zoeken
                 </button>
                 @if(request('search') || request('status') || request('payment_status'))
                     <a href="{{ route('sales.index') }}" 
-                       class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-lg transition duration-200">
-                        <i class="fa-solid fa-times mr-2"></i>Reset
+                       class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2 rounded-lg transition duration-200 flex items-center gap-2">
+                        <i class="fa-solid fa-times"></i>Reset
                     </a>
                 @endif
             </form>

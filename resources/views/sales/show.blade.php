@@ -242,10 +242,10 @@
                                     <option value="deposit_paid" @selected($sale->payment_status == 'deposit_paid')>💳 Aanbetaling</option>
                                     <option value="paid" @selected($sale->payment_status == 'paid')>💰 Volledig betaald</option>
                                 </select>
-                                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
+                                {{-- <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
                                     <i class="fa-solid fa-save mr-2"></i>
                                     Bijwerken
-                                </button>
+                                </button> --}}
                             </form>
                         @endif
                     </div>
