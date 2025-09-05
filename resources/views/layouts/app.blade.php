@@ -14,11 +14,6 @@
             body {
                 font-family: 'Inter', sans-serif;
             }
-            :root {
-                --primary-color: #2a2f37;
-                --text-color: #222222;
-                --border-radius: 4px;
-            }
         </style>
 
         <!-- Fonts -->
@@ -34,7 +29,7 @@
             </style>
         @endif
     </head>
-    <body class="h-screen flex">
+    <body class="flex min-h-screen">
         <div class="px-[1rem] py-[1.5rem] bg-[var(--primary-color)] flex flex-col gap-16">
             <div class="flex items-center gap-4 pl-2">
                 <div class="w-8 h-8 bg-[#0d0e11] rounded-[var(--border-radius)] flex items-center justify-center">

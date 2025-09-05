@@ -19,7 +19,7 @@
                 <p class="text-gray-600 mt-2">Volledig overzicht van reparatie #{{ $repair->id }}</p>
             </div>
             <div class="flex space-x-3">
-                <a href="{{ route('repairs.edit', $repair->id) }}" class="inline-flex items-center px-4 py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-medium rounded-xl transition-all duration-200">
+                <a href="{{ route('repairs.edit', $repair->id) }}" class="inline-flex items-center px-4 py-2 bg-[var(--button-edit)] hover:bg-[var(--button-edit)]/50 text-white font-medium rounded-xl transition-all duration-200">
                     <i class="fa-solid fa-edit mr-2"></i>
                     Bewerken
                 </a>
