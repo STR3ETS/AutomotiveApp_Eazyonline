@@ -1,11 +1,11 @@
-<div class="bg-white rounded-lg shadow-sm p-4 flex justify-between items-start">
+<div class="bg-[var(--background-card)] rounded-lg shadow-sm p-4 flex justify-between items-start">
     <div>
-        <h3 class="text-sm font-medium text-gray-500">{{ $title }}</h3>
-        <p class="text-3xl font-bold text-gray-900">{{ $value }}</p>
-        <p class="text-sm text-gray-500">{{ $subtitle }}</p>
+        <h3 class="text-sm font-medium text-[var(--text-secondary)]">{{ $title }}</h3>
+        <p class="text-3xl font-bold text-[var(--text-primary)]">{{ $value }}</p>
+        <p class="text-sm text-[var(--text-secondary)]">{{ $subtitle }}</p>
 
         @if($change !== null)
-            <p class="text-sm mt-1 {{ $change > 0 ? 'text-green-600' : 'text-red-600' }}">
+            <p class="text-sm mt-1 {{ $change > 0 ? 'text-[var(--status-success)]' : 'text-[var(--status-danger)]' }}">
                 <span class="inline-flex items-center">
                     @if($change > 0)
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="2"
@@ -27,7 +27,7 @@
         @endif
     </div>
 
-    <div class="bg-gray-100 text-gray-600 p-2 rounded-md">
+    <div class="bg-[var(--background-secondary)] text-[var(--text-secondary)] p-2 rounded-md">
         <i class="fa-solid fa-car text-xl"></i>
     </div>
 </div>

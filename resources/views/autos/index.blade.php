@@ -1,16 +1,16 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="bg-gray-50 min-h-full">
+<div class="bg-[var(--background-main)] min-h-full">
     <div class="max-w-7xl mx-auto px-4 py-8">
         <!-- Header with Add Button -->
         <div class="flex justify-between items-center mb-8">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900 mb-2">🚗 Auto Beheer</h1>
-                <p class="text-gray-600">Overzicht van alle auto's in je voorraad</p>
+                <h1 class="text-3xl font-bold text-[var(--text-primary)] mb-2">🚗 Auto Beheer</h1>
+                <p class="text-[var(--text-secondary)]">Overzicht van alle auto's in je voorraad</p>
             </div>
             <a href="{{ route('autos.create') }}" 
-               class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200 flex items-center gap-2">
+               class="bg-[var(--status-info)] hover:bg-[var(--status-info-dark)] text-[var(--text-white)] font-semibold py-2 px-4 rounded-lg transition duration-[var(--transition-normal)] flex items-center gap-2">
                 <i class="fa-solid fa-plus"></i>
                 Nieuwe Auto Toevoegen
             </a>
@@ -18,26 +18,26 @@
 
         <!-- Success/Error Messages -->
         @if(session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+            <div class="bg-[var(--status-success-bg)] border border-[var(--status-success-border)] text-[var(--status-success-text)] px-4 py-3 rounded mb-6">
                 <i class="fa-solid fa-check-circle mr-2"></i>
                 {{ session('success') }}
             </div>
         @endif
 
         @if(session('error'))
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+            <div class="bg-[var(--status-danger-bg)] border border-[var(--status-danger-light)] text-[var(--status-danger-text)] px-4 py-3 rounded mb-6">
                 <i class="fa-solid fa-exclamation-circle mr-2"></i>
                 {{ session('error') }}
             </div>
         @endif
 
         <!-- Search & Filters -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 hover-card">
+        <div class="bg-[var(--background-card)] rounded-xl shadow-sm border border-[var(--border-light)] p-6 mb-6 card-hover">
             <form method="GET" action="{{ route('autos.index') }}" class="flex flex-wrap gap-4">
                 <div class="flex-1 min-w-64">
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fa-solid fa-search text-gray-400"></i>
+                            <i class="fa-solid fa-search text-[var(--text-tertiary)]"></i>
                         </div>
                         <input type="text" 
                                name="search" 

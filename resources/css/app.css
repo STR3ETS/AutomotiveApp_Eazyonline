@@ -11,9 +11,216 @@
 }
 
 :root {
+    /* === HOOFDKLEUREN === */
+    /* Primaire kleuren voor de hoofdthema */
     --primary-color: #2a2f37;
-    --button-edit: green;
-    --button-
-    --text-color: #222222;
+    --primary-hover: #373d47;
+    --primary-light: #0d0e11;
+    --primary-lighter: rgba(42, 47, 55, 0.3);
+    
+    /* Achtergrond kleuren */
+    --background-main: #f9fafb;        /* gray-50 */
+    --background-card: #ffffff;        /* white */
+    --background-secondary: #f3f4f6;   /* gray-100 */
+    --background-hover: rgba(13, 14, 17, 0.5);
+    
+    /* Tekst kleuren */
+    --text-primary: #111827;           /* gray-900 */
+    --text-secondary: #6b7280;         /* gray-600 */
+    --text-tertiary: #9ca3af;          /* gray-400 */
+    --text-light: #e5e7eb;             /* gray-200 */
+    --text-white: #ffffff;
+    --text-white-dimmed: rgba(255, 255, 255, 0.5);
+    --text-white-muted: rgba(255, 255, 255, 0.8);
+    
+    /* Status kleuren */
+    /* Succes/Groen */
+    --status-success: #10b981;         /* green-500 */
+    --status-success-light: #d1fae5;   /* green-100 */
+    --status-success-dark: #047857;    /* green-700 */
+    --status-success-text: #065f46;    /* green-800 */
+    --status-success-bg: #f0fdf4;      /* green-50 */
+    --status-success-border: #bbf7d0;  /* green-200 */
+    
+    /* Info/Blauw */
+    --status-info: #3b82f6;            /* blue-500 */
+    --status-info-light: #dbeafe;      /* blue-100 */
+    --status-info-dark: #1d4ed8;       /* blue-700 */
+    --status-info-text: #1e40af;       /* blue-800 */
+    --status-info-bg: #eff6ff;         /* blue-50 */
+    --status-info-border: #93c5fd;     /* blue-300 */
+    
+    /* Waarschuwing/Geel */
+    --status-warning: #f59e0b;         /* amber-500 */
+    --status-warning-light: #fef3c7;   /* amber-100 */
+    --status-warning-dark: #d97706;    /* amber-600 */
+    --status-warning-text: #92400e;    /* amber-800 */
+    --status-warning-bg: #fffbeb;      /* amber-50 */
+    
+    /* Gevaar/Rood */
+    --status-danger: #ef4444;          /* red-500 */
+    --status-danger-light: #fecaca;    /* red-100 */
+    --status-danger-dark: #dc2626;     /* red-600 */
+    --status-danger-text: #991b1b;     /* red-800 */
+    --status-danger-bg: #fef2f2;       /* red-50 */
+    
+    /* Paars voor speciale functies */
+    --status-special: #8b5cf6;         /* violet-500 */
+    --status-special-light: #ede9fe;   /* violet-100 */
+    --status-special-dark: #7c3aed;    /* violet-600 */
+    --status-special-text: #5b21b6;    /* violet-800 */
+    
+    /* Oranje voor tools/onderhoud */
+    --status-maintenance: #f97316;     /* orange-500 */
+    --status-maintenance-light: #fed7aa; /* orange-100 */
+    --status-maintenance-text: #ea580c; /* orange-600 */
+    
+    /* Border kleuren */
+    --border-light: #e5e7eb;           /* gray-200 */
+    --border-medium: #d1d5db;          /* gray-300 */
+    --border-dark: #374151;            /* gray-700 */
+    
+    /* Shadow kleuren */
+    --shadow-light: rgba(0, 0, 0, 0.05);
+    --shadow-medium: rgba(0, 0, 0, 0.1);
+    --shadow-dark: rgba(0, 0, 0, 0.25);
+    
+    /* Gradient kleuren */
+    --gradient-blue-start: #eff6ff;    /* blue-50 */
+    --gradient-blue-end: #e0e7ff;      /* indigo-50 */
+    --gradient-green-start: #f0fdf4;   /* green-50 */
+    --gradient-green-end: #dcfce7;     /* green-100 */
+    
+    /* Layout en spacing */
     --border-radius: 4px;
+    --border-radius-large: 12px;
+    --transition-fast: 150ms;
+    --transition-normal: 300ms;
+    
+    /* === LEGACY SUPPORT === */
+    /* Oude variabelen voor backward compatibility */
+    --button-edit: var(--status-success);
+    --text-color: var(--text-primary);
+}
+
+/* === UTILITY CLASSES === */
+/* Voorgedefinieerde klassen voor veelgebruikte stijlen */
+
+/* Cards */
+.card-base {
+    background-color: var(--background-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--border-radius-large);
+    box-shadow: 0 1px 3px var(--shadow-light);
+}
+
+.card-hover {
+    transition: box-shadow var(--transition-fast) ease-in-out;
+}
+
+.card-hover:hover {
+    box-shadow: 0 4px 6px var(--shadow-medium);
+}
+
+/* Status badges */
+.badge-success {
+    background-color: var(--status-success-light);
+    color: var(--status-success-text);
+    border: 1px solid var(--status-success-border);
+}
+
+.badge-info {
+    background-color: var(--status-info-light);
+    color: var(--status-info-text);
+    border: 1px solid var(--status-info-border);
+}
+
+.badge-warning {
+    background-color: var(--status-warning-light);
+    color: var(--status-warning-text);
+}
+
+.badge-danger {
+    background-color: var(--status-danger-light);
+    color: var(--status-danger-text);
+}
+
+.badge-special {
+    background-color: var(--status-special-light);
+    color: var(--status-special-text);
+}
+
+.badge-maintenance {
+    background-color: var(--status-maintenance-light);
+    color: var(--status-maintenance-text);
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--primary-color);
+    color: var(--text-white);
+    border: 1px solid var(--primary-color);
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    transition: all var(--transition-fast) ease-in-out;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+}
+
+.btn-success {
+    background-color: var(--status-success);
+    color: var(--text-white);
+    border: 1px solid var(--status-success);
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    transition: all var(--transition-fast) ease-in-out;
+}
+
+.btn-success:hover {
+    background-color: var(--status-success-dark);
+    border-color: var(--status-success-dark);
+}
+
+.btn-danger {
+    background-color: var(--status-danger);
+    color: var(--text-white);
+    border: 1px solid var(--status-danger);
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    transition: all var(--transition-fast) ease-in-out;
+}
+
+.btn-danger:hover {
+    background-color: var(--status-danger-dark);
+    border-color: var(--status-danger-dark);
+}
+
+/* Text utilities */
+.text-heading {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.text-body {
+    color: var(--text-secondary);
+}
+
+.text-muted {
+    color: var(--text-tertiary);
+}
+
+/* Background utilities */
+.bg-main {
+    background-color: var(--background-main);
+}
+
+.bg-card {
+    background-color: var(--background-card);
+}
+
+.bg-secondary {
+    background-color: var(--background-secondary);
 }

@@ -32,72 +32,72 @@
     <body class="flex min-h-screen">
         <div class="px-[1rem] py-[1.5rem] bg-[var(--primary-color)] flex flex-col gap-16">
             <div class="flex items-center gap-4 pl-2">
-                <div class="w-8 h-8 bg-[#0d0e11] rounded-[var(--border-radius)] flex items-center justify-center">
-                    <i class="fa-solid fa-car-side fa-sm text-white"></i>
+                <div class="w-8 h-8 bg-[var(--primary-light)] rounded-[var(--border-radius)] flex items-center justify-center">
+                    <i class="fa-solid fa-car-side fa-sm text-[var(--text-white)]"></i>
                 </div>
                 <div>
-                    <h5 class="text-white text-sm font-semibold tracking-tighter">Bedrijfsnaam</h5>
-                    <h6 class="text-white/50 text-xs font-medium tracking-tighter">Operations Center</h6>
+                    <h5 class="text-[var(--text-white)] text-sm font-semibold tracking-tighter">Bedrijfsnaam</h5>
+                    <h6 class="text-[var(--text-white-dimmed)] text-xs font-medium tracking-tighter">Operations Center</h6>
                 </div>
             </div>
             <div>
-                <h4 class="text-white/80 text-xs font-semibold tracking-tighter pl-2 mb-2">Navigatie</h4>
+                <h4 class="text-[var(--text-white-muted)] text-xs font-semibold tracking-tighter pl-2 mb-2">Navigatie</h4>
                 <div class="flex flex-col">
-                    <a href="/" class="flex items-center transition duration-300 rounded-[var(--border-radius)] hover:bg-[var(--primary-color)]/30">
-                        <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[#0d0e11]/50 transition duration-300 p-2">
-                            <i class="fa-solid fa-house fa-sm text-white transition duration-300 min-w-[16px]"></i>
-                            <p class="text-sm text-white font-semibold tracking-tighter">Overzicht</p>
+                    <a href="/" class="flex items-center transition duration-[var(--transition-normal)] rounded-[var(--border-radius)] hover:bg-[var(--primary-lighter)]">
+                        <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[var(--background-hover)] transition duration-[var(--transition-normal)] p-2">
+                            <i class="fa-solid fa-house fa-sm text-[var(--text-white)] transition duration-[var(--transition-normal)] min-w-[16px]"></i>
+                            <p class="text-sm text-[var(--text-white)] font-semibold tracking-tighter">Overzicht</p>
                         </div>
                     </a>
-                    <a href="/agenda" class="flex items-center transition duration-300 rounded-[var(--border-radius)] hover:bg-[var(--primary-color)]/30">
-                        <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[#0d0e11]/50 transition duration-300 p-2">
-                            <i class="fa-solid fa-calendar-days fa-sm text-white transition duration-300 min-w-[16px]"></i>
-                            <p class="text-sm text-white font-semibold tracking-tighter">Agenda</p>
+                    <a href="/agenda" class="flex items-center transition duration-[var(--transition-normal)] rounded-[var(--border-radius)] hover:bg-[var(--primary-lighter)]">
+                        <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[var(--background-hover)] transition duration-[var(--transition-normal)] p-2">
+                            <i class="fa-solid fa-calendar-days fa-sm text-[var(--text-white)] transition duration-[var(--transition-normal)] min-w-[16px]"></i>
+                            <p class="text-sm text-[var(--text-white)] font-semibold tracking-tighter">Agenda</p>
                         </div>
                     </a>
-                    <a href="/pipeline" class="flex items-center transition duration-300 rounded-[var(--border-radius)] hover:bg-[var(--primary-color)]/30">
-                        <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[#0d0e11]/50 transition duration-300 p-2">
-                            <i class="fa-solid fa-box fa-sm text-white transition duration-300 min-w-[16px]"></i>
-                            <p class="text-sm text-white font-semibold tracking-tighter">Voorraad Pipeline</p>
+                    <a href="/pipeline" class="flex items-center transition duration-[var(--transition-normal)] rounded-[var(--border-radius)] hover:bg-[var(--primary-lighter)]">
+                        <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[var(--background-hover)] transition duration-[var(--transition-normal)] p-2">
+                            <i class="fa-solid fa-box fa-sm text-[var(--text-white)] transition duration-[var(--transition-normal)] min-w-[16px]"></i>
+                            <p class="text-sm text-[var(--text-white)] font-semibold tracking-tighter">Voorraad Pipeline</p>
                         </div>
                     </a>
-                    <a href="{{ route('autos.index') }}" class="flex items-center transition duration-300 rounded-[var(--border-radius)] hover:bg-[var(--primary-color)]/30">
-                        <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[#0d0e11]/50 transition duration-300 p-2">
-                            <i class="fa-solid fa-car fa-sm text-white transition duration-300 min-w-[16px]"></i>
-                            <p class="text-sm text-white font-semibold tracking-tighter">Auto Beheer</p>
+                    <a href="{{ route('autos.index') }}" class="flex items-center transition duration-[var(--transition-normal)] rounded-[var(--border-radius)] hover:bg-[var(--primary-lighter)]">
+                        <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[var(--background-hover)] transition duration-[var(--transition-normal)] p-2">
+                            <i class="fa-solid fa-car fa-sm text-[var(--text-white)] transition duration-[var(--transition-normal)] min-w-[16px]"></i>
+                            <p class="text-sm text-[var(--text-white)] font-semibold tracking-tighter">Auto Beheer</p>
                         </div>
                     </a>
-                    <a href="/repairs" class="flex items-center transition duration-300 rounded-[var(--border-radius)] hover:bg-[var(--primary-color)]/30">
-                        <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[#0d0e11]/50 transition duration-300 p-2">
-                            <i class="fa-solid fa-wrench fa-sm text-white transition duration-300 min-w-[16px]"></i>
-                            <p class="text-sm text-white font-semibold tracking-tighter">Reparaties</p>
+                    <a href="/repairs" class="flex items-center transition duration-[var(--transition-normal)] rounded-[var(--border-radius)] hover:bg-[var(--primary-lighter)]">
+                        <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[var(--background-hover)] transition duration-[var(--transition-normal)] p-2">
+                            <i class="fa-solid fa-wrench fa-sm text-[var(--text-white)] transition duration-[var(--transition-normal)] min-w-[16px]"></i>
+                            <p class="text-sm text-[var(--text-white)] font-semibold tracking-tighter">Reparaties</p>
                         </div>
                     </a>
-                    <a href="{{ route('sales-ready.index') }}" class="flex items-center transition duration-300 rounded-[var(--border-radius)] hover:bg-[var(--primary-color)]/30">
-                        <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[#0d0e11]/50 transition duration-300 p-2">
-                            <i class="fa-solid fa-check fa-sm text-white transition duration-300 min-w-[16px]"></i>
-                            <p class="text-sm text-white font-semibold tracking-tighter">Verkoop Klaar</p>
+                    <a href="{{ route('sales-ready.index') }}" class="flex items-center transition duration-[var(--transition-normal)] rounded-[var(--border-radius)] hover:bg-[var(--primary-lighter)]">
+                        <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[var(--background-hover)] transition duration-[var(--transition-normal)] p-2">
+                            <i class="fa-solid fa-check fa-sm text-[var(--text-white)] transition duration-[var(--transition-normal)] min-w-[16px]"></i>
+                            <p class="text-sm text-[var(--text-white)] font-semibold tracking-tighter">Verkoop Klaar</p>
                         </div>
                     </a>
-                    <a href="{{ route('customers.index') }}" class="flex items-center transition duration-300 rounded-[var(--border-radius)] hover:bg-[var(--primary-color)]/30">
-                        <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[#0d0e11]/50 transition duration-300 p-2">
-                            <i class="fa-solid fa-users fa-sm text-white transition duration-300 min-w-[16px]"></i>
-                            <p class="text-sm text-white font-semibold tracking-tighter">Klanten</p>
+                    <a href="{{ route('customers.index') }}" class="flex items-center transition duration-[var(--transition-normal)] rounded-[var(--border-radius)] hover:bg-[var(--primary-lighter)]">
+                        <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[var(--background-hover)] transition duration-[var(--transition-normal)] p-2">
+                            <i class="fa-solid fa-users fa-sm text-[var(--text-white)] transition duration-[var(--transition-normal)] min-w-[16px]"></i>
+                            <p class="text-sm text-[var(--text-white)] font-semibold tracking-tighter">Klanten</p>
                         </div>
                     </a>
-                    <a href="{{ route('active-sales.index') }}" class="flex items-center transition duration-300 rounded-[var(--border-radius)] hover:bg-[var(--primary-color)]/30">
-                        <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[#0d0e11]/50 transition duration-300 p-2">
-                            <i class="fa-solid fa-handshake fa-sm text-white transition duration-300 min-w-[16px]"></i>
-                            <p class="text-sm text-white font-semibold tracking-tighter">Klaar voor Oplevering</p>
+                    <a href="{{ route('active-sales.index') }}" class="flex items-center transition duration-[var(--transition-normal)] rounded-[var(--border-radius)] hover:bg-[var(--primary-lighter)]">
+                        <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[var(--background-hover)] transition duration-[var(--transition-normal)] p-2">
+                            <i class="fa-solid fa-handshake fa-sm text-[var(--text-white)] transition duration-[var(--transition-normal)] min-w-[16px]"></i>
+                            <p class="text-sm text-[var(--text-white)] font-semibold tracking-tighter">Klaar voor Oplevering</p>
                         </div>
                     </a>
-                    {{-- <a href="/klaar-voor-oplevering" class="flex items-center transition duration-300 rounded-[var(--border-radius)] hover:bg-[var(--primary-color)]/30">
-                        <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[#0d0e11]/50 transition duration-300 p-2">
-                            <i class="fa-solid fa-flag-checkered fa-sm text-white transition duration-300 min-w-[16px]"></i>
-                            <p class="text-sm text-white font-semibold tracking-tighter">Klaar voor Oplevering</p>
+                    {{-- <a href="/klaar-voor-oplevering" class="flex items-center transition duration-[var(--transition-normal)] rounded-[var(--border-radius)] hover:bg-[var(--primary-lighter)]">
+                        <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[var(--background-hover)] transition duration-[var(--transition-normal)] p-2">
+                            <i class="fa-solid fa-flag-checkered fa-sm text-[var(--text-white)] transition duration-[var(--transition-normal)] min-w-[16px]"></i>
+                            <p class="text-sm text-[var(--text-white)] font-semibold tracking-tighter">Klaar voor Oplevering</p>
                         </div>
                     </a> --}}
-                    <a href="{{ route('reports.index') }}" class="flex items-center transition duration-300 rounded-[var(--border-radius)] hover:bg-[var(--primary-color)]/30">
+                    <a href="{{ route('reports.index') }}" class="flex items-center transition duration-[var(--transition-normal)] rounded-[var(--border-radius)] hover:bg-[var(--primary-lighter)]">
                         <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[#0d0e11]/50 transition duration-300 p-2">
                             <i class="fa-solid fa-clipboard fa-sm text-white transition duration-300 min-w-[16px]"></i>
                             <p class="text-sm text-white font-semibold tracking-tighter">Rapportage</p>

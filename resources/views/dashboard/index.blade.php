@@ -1,70 +1,70 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="bg-gray-50 min-h-full">
+<div class="bg-[var(--background-main)] min-h-full">
     <div class="max-w-7xl mx-auto px-4 py-8">
         <!-- Header -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">🏠 Dashboard</h1>
-            <p class="text-gray-600">Welkom terug! Hier is je overzicht van vandaag</p>
+            <h1 class="text-3xl font-bold text-[var(--text-primary)] mb-2">🏠 Dashboard</h1>
+            <p class="text-[var(--text-secondary)]">Welkom terug! Hier is je overzicht van vandaag</p>
         </div>
         
         <!-- Statistieken Cards -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover-card">
+            <div class="bg-[var(--background-card)] rounded-xl shadow-sm border border-[var(--border-light)] p-6 hover-card">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600">Totaal Auto's</p>
-                        <p class="text-3xl font-bold text-gray-900">{{ $totalCars }}</p>
+                        <p class="text-sm font-medium text-[var(--text-secondary)]">Totaal Auto's</p>
+                        <p class="text-3xl font-bold text-[var(--text-primary)]">{{ $totalCars }}</p>
                     </div>
-                    <div class="p-3 bg-blue-100 rounded-full">
-                        <i class="fas fa-car text-blue-600 text-xl"></i>
+                    <div class="p-3 bg-[var(--status-info-light)] rounded-full">
+                        <i class="fas fa-car text-[var(--status-info)] text-xl"></i>
                     </div>
                 </div>
             </div>
             
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover-card">
+            <div class="bg-[var(--background-card)] rounded-xl shadow-sm border border-[var(--border-light)] p-6 hover-card">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600">Auto's in Intake</p>
-                        <p class="text-3xl font-bold text-gray-900">{{ $intakeCars }}</p>
+                        <p class="text-sm font-medium text-[var(--text-secondary)]">Auto's in Intake</p>
+                        <p class="text-3xl font-bold text-[var(--text-primary)]">{{ $intakeCars }}</p>
                     </div>
-                    <div class="p-3 bg-green-100 rounded-full">
-                        <i class="fas fa-download text-green-600 text-xl"></i>
+                    <div class="p-3 bg-[var(--status-success-light)] rounded-full">
+                        <i class="fas fa-download text-[var(--status-success)] text-xl"></i>
                     </div>
                 </div>
             </div>
             
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover-card">
+            <div class="bg-[var(--background-card)] rounded-xl shadow-sm border border-[var(--border-light)] p-6 hover-card">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600">Advertenties Live</p>
-                        <p class="text-3xl font-bold text-gray-900">{{ $liveAds }}</p>
+                        <p class="text-sm font-medium text-[var(--text-secondary)]">Advertenties Live</p>
+                        <p class="text-3xl font-bold text-[var(--text-primary)]">{{ $liveAds }}</p>
                     </div>
-                    <div class="p-3 bg-purple-100 rounded-full">
-                        <i class="fas fa-bullhorn text-purple-600 text-xl"></i>
+                    <div class="p-3 bg-[var(--status-special-light)] rounded-full">
+                        <i class="fas fa-bullhorn text-[var(--status-special)] text-xl"></i>
                     </div>
                 </div>
             </div>
             
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover-card">
+            <div class="bg-[var(--background-card)] rounded-xl shadow-sm border border-[var(--border-light)] p-6 hover-card">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600">Open Reparaties</p>
-                        <p class="text-3xl font-bold text-gray-900">{{ $openRepairs }}</p>
+                        <p class="text-sm font-medium text-[var(--text-secondary)]">Open Reparaties</p>
+                        <p class="text-3xl font-bold text-[var(--text-primary)]">{{ $openRepairs }}</p>
                     </div>
-                    <div class="p-3 bg-red-100 rounded-full">
-                        <i class="fas fa-wrench text-red-600 text-xl"></i>
+                    <div class="p-3 bg-[var(--status-danger-light)] rounded-full">
+                        <i class="fas fa-wrench text-[var(--status-danger)] text-xl"></i>
                     </div>
                 </div>
             </div>
         </div>
         
         <!-- Weekagenda -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 hover-card">
-            <div class="p-6 border-b border-gray-200">
-                <h2 class="text-xl font-bold text-gray-900 flex items-center">
-                    <i class="fas fa-calendar-alt text-blue-600 mr-3"></i>
+        <div class="bg-[var(--background-card)] rounded-xl shadow-sm border border-[var(--border-light)] hover-card">
+            <div class="p-6 border-b border-[var(--border-light)]">
+                <h2 class="text-xl font-bold text-[var(--text-primary)] flex items-center">
+                    <i class="fas fa-calendar-alt text-[var(--status-info)] mr-3"></i>
                     Weekagenda
                 </h2>
             </div>
@@ -73,27 +73,27 @@
                 @if($weekAppointments->count() > 0)
                     <div class="space-y-4">
                         @foreach($weekAppointments as $appointment)
-                            <div class="flex items-start p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100 hover:shadow-md transition-all duration-200">
-                                <div class="flex-shrink-0 w-4 h-4 bg-blue-500 rounded-full mt-1 mr-4"></div>
+                            <div class="flex items-start p-4 bg-gradient-to-r from-[var(--gradient-blue-start)] to-[var(--gradient-blue-end)] rounded-lg border border-[var(--status-info-border)] hover:shadow-md transition-all duration-[var(--transition-normal)]">
+                                <div class="flex-shrink-0 w-4 h-4 bg-[var(--status-info)] rounded-full mt-1 mr-4"></div>
                                 <div class="flex-1">
                                     <div class="flex items-center justify-between">
-                                        <h3 class="font-semibold text-gray-900">
+                                        <h3 class="font-semibold text-[var(--text-primary)]">
                                             {{ ucfirst($appointment->type) }} 
                                             @if($appointment->car)
                                                 {{ $appointment->car->brand }} {{ $appointment->car->model }}
                                             @endif
                                         </h3>
-                                        <span class="text-sm text-gray-500 bg-white px-2 py-1 rounded">{{ $appointment->day_label }}</span>
+                                        <span class="text-sm text-[var(--text-secondary)] bg-[var(--background-card)] px-2 py-1 rounded">{{ $appointment->day_label }}</span>
                                     </div>
                                     @if($appointment->customer || $appointment->customer_name)
-                                        <p class="text-gray-600 text-sm mt-1 flex items-center">
-                                            <i class="fas fa-user text-gray-400 mr-1"></i>
+                                        <p class="text-[var(--text-secondary)] text-sm mt-1 flex items-center">
+                                            <i class="fas fa-user text-[var(--text-tertiary)] mr-1"></i>
                                             {{ $appointment->customer ? $appointment->customer->name : $appointment->customer_name }}
                                         </p>
                                     @endif
                                     @if($appointment->notes)
-                                        <p class="text-gray-500 text-sm mt-1 flex items-center">
-                                            <i class="fas fa-sticky-note text-gray-400 mr-1"></i>
+                                        <p class="text-[var(--text-secondary)] text-sm mt-1 flex items-center">
+                                            <i class="fas fa-sticky-note text-[var(--text-tertiary)] mr-1"></i>
                                             {{ $appointment->notes }}
                                         </p>
                                     @endif
@@ -104,15 +104,15 @@
                 @else
                     <!-- Voorbeeld agenda items als er geen echte data is -->
                     <div class="space-y-4">
-                        <div class="flex items-start p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100 hover:shadow-md transition-all duration-200">
-                            <div class="flex-shrink-0 w-4 h-4 bg-blue-500 rounded-full mt-1 mr-4"></div>
+                        <div class="flex items-start p-4 bg-gradient-to-r from-[var(--gradient-blue-start)] to-[var(--gradient-blue-end)] rounded-lg border border-[var(--status-info-border)] hover:shadow-md transition-all duration-[var(--transition-normal)]">
+                            <div class="flex-shrink-0 w-4 h-4 bg-[var(--status-info)] rounded-full mt-1 mr-4"></div>
                             <div class="flex-1">
                                 <div class="flex items-center justify-between">
-                                    <h3 class="font-semibold text-gray-900">Proefrit BMW 320i</h3>
-                                    <span class="text-sm text-gray-500 bg-white px-2 py-1 rounded">Vandaag 14:00</span>
+                                    <h3 class="font-semibold text-[var(--text-primary)]">Proefrit BMW 320i</h3>
+                                    <span class="text-sm text-[var(--text-secondary)] bg-[var(--background-card)] px-2 py-1 rounded">Vandaag 14:00</span>
                                 </div>
-                                <p class="text-gray-600 text-sm mt-1 flex items-center">
-                                    <i class="fas fa-user text-gray-400 mr-1"></i>
+                                <p class="text-[var(--text-secondary)] text-sm mt-1 flex items-center">
+                                    <i class="fas fa-user text-[var(--text-tertiary)] mr-1"></i>
                                     P. van der Berg
                                 </p>
                             </div>

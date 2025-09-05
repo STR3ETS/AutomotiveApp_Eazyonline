@@ -3,8 +3,8 @@
 @section('content')
 <div class="max-w-full mx-auto py-10 px-4">
     <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">Verkoop Klaar</h1>
-        <div class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">
+        <h1 class="text-3xl font-bold text-[var(--text-primary)]">Verkoop Klaar</h1>
+        <div class="bg-[var(--status-info-light)] text-[var(--status-info-text)] text-sm font-medium px-3 py-1 rounded-full">
             {{ $cars->count() }} auto{{ $cars->count() !== 1 ? "'s" : '' }} verkoop klaar
         </div>
     </div>
@@ -12,33 +12,33 @@
     @if($cars->count() === 0)
         <div class="text-center py-16">
             <div class="text-6xl mb-4">🚗</div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-2">Geen auto's verkoop klaar</h3>
-            <p class="text-gray-600">Er staan momenteel geen auto's in de "Verkoop klaar" fase.</p>
+            <h3 class="text-xl font-semibold text-[var(--text-primary)] mb-2">Geen auto's verkoop klaar</h3>
+            <p class="text-[var(--text-secondary)]">Er staan momenteel geen auto's in de "Verkoop klaar" fase.</p>
         </div>
     @else
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             @foreach($cars as $car)
-                <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                <div class="bg-[var(--background-card)] rounded-xl shadow-lg border border-[var(--border-light)] overflow-hidden">
                     <!-- Car Header -->
-                    <div class="bg-gradient-to-r from-green-50 to-green-100 p-6 border-b border-green-200">
+                    <div class="bg-gradient-to-r from-[var(--gradient-green-start)] to-[var(--gradient-green-end)] p-6 border-b border-[var(--status-success-border)]">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h2 class="text-xl font-bold text-green-900 mb-1">
+                                <h2 class="text-xl font-bold text-[var(--status-success-text)] mb-1">
                                     {{ $car->license_plate }}
                                 </h2>
-                                <p class="text-green-700 font-medium">
+                                <p class="text-[var(--status-success-dark)] font-medium">
                                     {{ $car->brand }} {{ $car->model }} ({{ $car->year }})
                                 </p>
-                                <p class="text-green-600 text-sm mt-1">
+                                <p class="text-[var(--status-success)] text-sm mt-1">
                                     {{ number_format($car->mileage) }} km
                                 </p>
                             </div>
                             <div class="text-right">
-                                <div class="text-2xl font-bold text-green-900">
+                                <div class="text-2xl font-bold text-[var(--status-success-text)]">
                                     € {{ number_format($car->price, 2, ',', '.') }}
                                 </div>
-                                <div class="inline-flex items-center px-3 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full mt-2">
-                                    <span class="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
+                                <div class="inline-flex items-center px-3 py-1 text-xs font-medium bg-[var(--status-success-light)] text-[var(--status-success-text)] rounded-full mt-2">
+                                    <span class="w-2 h-2 bg-[var(--status-success)] rounded-full mr-2"></span>
                                     Verkoop klaar
                                 </div>
                             </div>
@@ -47,7 +47,7 @@
 
                     <!-- Completed Tasks Overview -->
                     <div class="p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <h3 class="text-lg font-semibold text-[var(--text-primary)] mb-4 flex items-center">
                             <i class="fas fa-check-circle text-green-500 mr-2"></i>
                             Uitgevoerde Werkzaamheden
                         </h3>
