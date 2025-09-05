@@ -26,12 +26,19 @@ Route::delete('/agenda/{id}', [AgendaController::class, 'destroy'])->name('agend
 
 
 Route::get('/repairs', [RepairController::class, 'index'])->name('repairs.index');
+Route::get('/repairs/create', [RepairController::class, 'create'])->name('repairs.create');
 Route::post('/repairs', [RepairController::class, 'store'])->name('repairs.store');
+Route::get('/repairs/analytics', [RepairController::class, 'analytics'])->name('repairs.analytics');
+Route::get('/repairs/{repair}', [RepairController::class, 'show'])->name('repairs.show');
+Route::get('/repairs/{repair}/edit', [RepairController::class, 'edit'])->name('repairs.edit');
 Route::put('/repairs/{repair}', [RepairController::class, 'update'])->name('repairs.update');
 Route::delete('/repairs/{repair}', [RepairController::class, 'destroy'])->name('repairs.destroy');
 
-Route::post('/repairs/{repair}/parts', [RepairController::class, 'addPart'])->name('repairs.parts.store');
+// Parts management routes
+Route::get('/repairs/{repair}/parts', [RepairController::class, 'partsIndex'])->name('repairs.parts.index');
+Route::post('/repairs/{repair}/parts', [RepairController::class, 'storePart'])->name('repairs.parts.store');
 Route::put('/parts/{part}', [RepairController::class, 'updatePart'])->name('parts.update');
+Route::delete('/parts/{part}', [RepairController::class, 'destroyPart'])->name('parts.destroy');
 
 Route::resource('sales', SalesController::class);
 Route::post('/sales/{sale}/deliver', [SalesController::class, 'markAsDelivered'])->name('sales.deliver');
