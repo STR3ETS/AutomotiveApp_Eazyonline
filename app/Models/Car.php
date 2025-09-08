@@ -7,12 +7,13 @@ use App\Models\Sale;
 use App\Models\Repair;
 use App\Models\Appointment;
 use App\Models\CarStageTransition;
+use App\Traits\BelongsToCompany;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Car extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToCompany;
 
     protected $table = 'cars';
 
@@ -25,6 +26,7 @@ class Car extends Model
         'price',
         'status',
         'stage_id',
+        'company_id',
     ];
 
     // Boot method to ensure status matches stage

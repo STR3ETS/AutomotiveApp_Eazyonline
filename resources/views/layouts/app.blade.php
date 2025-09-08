@@ -36,7 +36,9 @@
                     <i class="fa-solid fa-car-side fa-sm text-[var(--text-white)]"></i>
                 </div>
                 <div>
-                    <h5 class="text-[var(--text-white)] text-sm font-semibold tracking-tighter">Bedrijfsnaam</h5>
+                    <h5 class="text-[var(--text-white)] text-sm font-semibold tracking-tighter">
+                        {{ session('authenticated') && isset($currentCompany) ? $currentCompany->name : 'Bedrijfsnaam' }}
+                    </h5>
                     <h6 class="text-[var(--text-white-dimmed)] text-xs font-medium tracking-tighter">Operations Center</h6>
                 </div>
             </div>
@@ -113,13 +115,23 @@
             </div>
         </div>
         <div class="flex-1 h-full flex flex-col">
-            <div class="p-[1rem] border-b border-[#e2e2e2]">
-                <h3 class="text-[var(--text-color)] font-bold tracking-tighter text-lg leading-tight">
-                    Goeiedag Voornaam Achternaam
-                </h3>
-                <h4 class="text-[var(--text-color)]/50 font-semibold tracking-tighter text-sm leading-tight">
-                    Dag Maand Jaar van vandaag
-                </h4>
+            <div class="p-[1rem] border-b border-[#e2e2e2] flex justify-between items-center">
+                <div>
+                    <h3 class="text-[var(--text-color)] font-bold tracking-tighter text-lg leading-tight">
+                        Goeiedag {{ session('username', 'Gebruiker') }}
+                    </h3>
+                    <h4 class="text-[var(--text-color)]/50 font-semibold tracking-tighter text-sm leading-tight">
+                        {{ now()->format('l j F Y') }}
+                    </h4>
+                </div>
+                @if(session('authenticated'))
+                    <form method="POST" action="{{ route('auth.logout') }}">
+                        @csrf
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors duration-200">
+                            <i class="fa-solid fa-sign-out-alt mr-2"></i>Uitloggen
+                        </button>
+                    </form>
+                @endif
             </div>
             <div class="flex-1">
                 @yield('content')

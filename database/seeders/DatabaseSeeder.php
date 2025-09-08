@@ -20,9 +20,12 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
-        // Seed car_stages
-        $this->call(\Database\Seeders\CarStagesTableSeeder::class);
-        $this->call(\Database\Seeders\CarsTableSeeder::class);
-        $this->call(\Database\Seeders\ChecklistSeeder::class);
+        // Seed companies with their data (this will also create car stages)
+        $this->call(CompanySeeder::class);
+        
+        // Legacy seeders (commented out as they don't support multi-tenancy yet)
+        // $this->call(\Database\Seeders\CarStagesTableSeeder::class);
+        // $this->call(\Database\Seeders\CarsTableSeeder::class);
+        // $this->call(\Database\Seeders\ChecklistSeeder::class);
     }
 }

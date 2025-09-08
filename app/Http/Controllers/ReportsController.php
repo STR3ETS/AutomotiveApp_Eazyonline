@@ -125,8 +125,10 @@ class ReportsController extends Controller
             ->get();
         
         // Top performing car brands
-        $brandPerformance = Sale::join('cars', 'sales.car_id', '=', 'cars.id')
+        $brandPerformance = DB::table('sales')
+            ->join('cars', 'sales.car_id', '=', 'cars.id')
             ->where('sales.status', 'delivered')
+            ->where('sales.company_id', config('app.current_company_id'))
             ->selectRaw('cars.brand, COUNT(*) as sales_count, AVG(sales.sale_price) as avg_price, SUM(sales.sale_price) as total_revenue')
             ->groupBy('cars.brand')
             ->orderByDesc('total_revenue')
