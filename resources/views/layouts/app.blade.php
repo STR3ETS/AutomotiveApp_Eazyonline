@@ -87,6 +87,12 @@
                             <p class="text-sm text-[var(--text-white)] font-semibold tracking-tighter">Klanten</p>
                         </div>
                     </a>
+                    <a href="{{ route('employees.index') }}" class="flex items-center transition duration-[var(--transition-normal)] rounded-[var(--border-radius)] hover:bg-[var(--primary-lighter)]">
+                        <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[var(--background-hover)] transition duration-[var(--transition-normal)] p-2">
+                            <i class="fa-solid fa-user-hard-hat fa-sm text-[var(--text-white)] transition duration-[var(--transition-normal)] min-w-[16px]"></i>
+                            <p class="text-sm text-[var(--text-white)] font-semibold tracking-tighter">Medewerkers</p>
+                        </div>
+                    </a>
                     <a href="{{ route('active-sales.index') }}" class="flex items-center transition duration-[var(--transition-normal)] rounded-[var(--border-radius)] hover:bg-[var(--primary-lighter)]">
                         <div class="rounded-[var(--border-radius)] flex items-center gap-2 w-[200px] hover:bg-[var(--background-hover)] transition duration-[var(--transition-normal)] p-2">
                             <i class="fa-solid fa-handshake fa-sm text-[var(--text-white)] transition duration-[var(--transition-normal)] min-w-[16px]"></i>

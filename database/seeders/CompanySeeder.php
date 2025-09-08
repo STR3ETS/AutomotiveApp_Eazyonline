@@ -13,6 +13,7 @@ use App\Models\Repair;
 use App\Models\Part;
 use App\Models\Sale;
 use App\Models\CarStage;
+use App\Models\Employee;
 
 class CompanySeeder extends Seeder
 {
@@ -55,63 +56,75 @@ class CompanySeeder extends Seeder
         }
 
         // Company 1: AutoGarage Piet
-        $company1 = Company::create([
-            'name' => 'AutoGarage Piet',
-            'subdomain' => 'piet',
-            'primary_color' => '#dc2626', // Red
-            'active' => true,
-        ]);
+        $company1 = Company::firstOrCreate(
+            ['subdomain' => 'piet'],
+            [
+                'name' => 'AutoGarage Piet',
+                'primary_color' => '#dc2626', // Red
+                'active' => true,
+            ]
+        );
 
         $this->seedCompanyData($company1, [
             'user_name' => 'Piet van der Berg',
             'user_email' => 'piet@autogaragepiet.nl',
             'cars_count' => 8,
             'customers_count' => 12,
+            'employees_count' => 4,
         ]);
 
         // Company 2: De Snelle Garage
-        $company2 = Company::create([
-            'name' => 'De Snelle Garage',
-            'subdomain' => 'snelle',
-            'primary_color' => '#059669', // Green
-            'active' => true,
-        ]);
+        $company2 = Company::firstOrCreate(
+            ['subdomain' => 'snelle'],
+            [
+                'name' => 'De Snelle Garage',
+                'primary_color' => '#059669', // Green
+                'active' => true,
+            ]
+        );
 
         $this->seedCompanyData($company2, [
             'user_name' => 'Mark Jansen',
             'user_email' => 'mark@desnellegarage.nl',
             'cars_count' => 6,
             'customers_count' => 8,
+            'employees_count' => 3,
         ]);
 
         // Company 3: Premium Motors
-        $company3 = Company::create([
-            'name' => 'Premium Motors',
-            'subdomain' => 'premium',
-            'primary_color' => '#7c3aed', // Purple
-            'active' => true,
-        ]);
+        $company3 = Company::firstOrCreate(
+            ['subdomain' => 'premium'],
+            [
+                'name' => 'Premium Motors',
+                'primary_color' => '#7c3aed', // Purple
+                'active' => true,
+            ]
+        );
 
         $this->seedCompanyData($company3, [
             'user_name' => 'Lisa de Vries',
             'user_email' => 'lisa@premiummotors.nl',
             'cars_count' => 12,
             'customers_count' => 15,
+            'employees_count' => 5,
         ]);
 
         // Company 4: Buurgarage Jan
-        $company4 = Company::create([
-            'name' => 'Buurgarage Jan',
-            'subdomain' => 'buurgarage',
-            'primary_color' => '#ea580c', // Orange
-            'active' => true,
-        ]);
+        $company4 = Company::firstOrCreate(
+            ['subdomain' => 'buurgarage'],
+            [
+                'name' => 'Buurgarage Jan',
+                'primary_color' => '#ea580c', // Orange
+                'active' => true,
+            ]
+        );
 
         $this->seedCompanyData($company4, [
             'user_name' => 'Jan Bakker',
             'user_email' => 'jan@buurgaragejan.nl',
             'cars_count' => 4,
             'customers_count' => 6,
+            'employees_count' => 2,
         ]);
 
         echo "✅ Created 4 companies with users, cars, customers, and appointments!\n";
@@ -145,6 +158,29 @@ class CompanySeeder extends Seeder
                 'address' => 'Voorbeeldstraat ' . rand(1, 100) . ', 1234AB Voorbeeldstad',
                 'company_id' => $company->id,
             ]);
+        }
+
+        // Create employees
+        $employees = [];
+        $employeeData = [
+            ['name' => 'Marco van der Berg', 'position' => 'Hoofdmonteur', 'specializations' => ['APK', 'Diagnose', 'Motor']],
+            ['name' => 'Dennis Janssen', 'position' => 'Monteur', 'specializations' => ['Remmen', 'Uitlaat', 'Banden']],
+            ['name' => 'Kevin Smit', 'position' => 'APK-keurder', 'specializations' => ['APK', 'Controle']],
+            ['name' => 'Roy Bakker', 'position' => 'Leerling', 'specializations' => ['Onderhoud', 'Controle']],
+            ['name' => 'Patrick de Vries', 'position' => 'Monteur', 'specializations' => ['Carrosserie', 'Lakwerk']],
+        ];
+
+        foreach ($employeeData as $index => $empData) {
+            if ($index < $config['employees_count']) {
+                $employees[] = Employee::create([
+                    'name' => $empData['name'],
+                    'email' => strtolower(str_replace(' ', '.', $empData['name'])) . '@' . $company->subdomain . '.nl',
+                    'phone' => '06' . rand(10000000, 99999999),
+                    'position' => $empData['position'],
+                    'specializations' => $empData['specializations'],
+                    'company_id' => $company->id,
+                ]);
+            }
         }
 
         // Create cars with different statuses

@@ -53,6 +53,11 @@ class Company extends Model
         return $this->hasMany(Sale::class);
     }
 
+    public function employees(): HasMany
+    {
+        return $this->hasMany(Employee::class);
+    }
+
     // Helper methods
     public function generateColorVariants(): array
     {

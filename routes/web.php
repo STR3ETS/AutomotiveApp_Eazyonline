@@ -14,6 +14,7 @@ use App\Http\Controllers\ActiveSalesController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\TenantTestController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EmployeeController;
 
 // Authentication routes (GEEN LOGIN VEREIST)
 Route::get('/login', [AuthController::class, 'showLogin'])->name('auth.login');
@@ -75,6 +76,12 @@ Route::middleware(['auth.simple', 'tenant'])->group(function () {
 
     // Customers
     Route::resource('customers', CustomerController::class);
+
+    // Employees
+    Route::resource('employees', EmployeeController::class);
+    Route::post('/employees/{employee}/assign-car', [EmployeeController::class, 'assignCar'])->name('employees.assign-car');
+    Route::post('/employees/{employee}/assignments/{assignment}/complete', [EmployeeController::class, 'completeAssignment'])->name('employees.complete-assignment');
+    Route::post('/employees/{employee}/assignments/{assignment}/cancel', [EmployeeController::class, 'cancelAssignment'])->name('employees.cancel-assignment');
 
     // Reports
     Route::get('/rapportage', [ReportsController::class, 'index'])->name('reports.index');

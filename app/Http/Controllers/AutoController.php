@@ -15,7 +15,7 @@ class AutoController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Car::with('stage');
+        $query = Car::with(['stage', 'currentAssignment.employee']);
         
         // Search functionality
         if ($request->filled('search')) {
@@ -81,7 +81,7 @@ class AutoController extends Controller
      */
     public function show(Car $auto)
     {
-        $auto->load(['stage', 'checklists.stage', 'repairs.parts', 'appointments', 'sales.customer']);
+        $auto->load(['stage', 'checklists.stage', 'repairs.parts', 'appointments', 'sales.customer', 'currentAssignment.employee']);
         return view('autos.show', compact('auto'));
     }
 

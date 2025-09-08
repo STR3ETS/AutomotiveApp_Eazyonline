@@ -76,9 +76,12 @@
                                     Fase
                                 </th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                    Prijs
+                                    Toegewezen aan
                                 </th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Prijs
+                                </th>
+                                <th class="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                     Toegevoegd
                                 </th>
                                 <th class="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -132,6 +135,22 @@
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                                                 Onbekend
                                             </span>
+                                        @endif
+                                    </td>
+
+                                    <td class="px-6 py-4">
+                                        @if($car->currentAssignment && $car->currentAssignment->employee)
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                                    {{ strtoupper(substr($car->currentAssignment->employee->name, 0, 1)) }}
+                                                </div>
+                                                <div>
+                                                    <div class="text-sm font-medium text-gray-900">{{ $car->currentAssignment->employee->name }}</div>
+                                                    <div class="text-xs text-gray-500">{{ $car->currentAssignment->employee->position }}</div>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <span class="text-xs text-gray-400 italic">Niet toegewezen</span>
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 text-sm text-gray-900">
