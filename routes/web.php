@@ -110,3 +110,23 @@ Route::middleware(['auth.simple', 'tenant'])->group(function () {
     Route::get('/tenant-test', [TenantTestController::class, 'index'])->name('tenant.test');
     Route::get('/set-tenant/{company}', [TenantTestController::class, 'setTenant'])->name('tenant.set');
 });
+
+// OAuth routes (outside auth middleware)
+Route::get('/oauth/marketplace/redirect', [App\Http\Controllers\MarketplaceAuthController::class, 'redirect'])
+    ->name('oauth.marketplace.redirect');
+Route::get('/oauth/marketplace/callback', [App\Http\Controllers\MarketplaceAuthController::class, 'callback'])
+    ->name('oauth.marketplace.callback');
+
+// API Integration routes (with tenant context)
+Route::middleware(['auth.simple', App\Http\Middleware\TenantContext::class])->group(function () {
+    // Listing publishing API
+    Route::post('/tenants/{tenant}/listings/{id}/publish', [App\Http\Controllers\ListingPublishController::class, 'publishListing'])
+        ->name('api.listings.publish');
+    
+    Route::get('/tenants/{tenant}/listings/{id}/status', [App\Http\Controllers\ListingPublishController::class, 'getListingStatus'])
+        ->name('api.listings.status');
+    
+    // Analytics API
+    Route::get('/tenants/{tenant}/analytics/active-users', [App\Http\Controllers\ListingPublishController::class, 'getActiveUsers'])
+        ->name('api.analytics.active-users');
+});
