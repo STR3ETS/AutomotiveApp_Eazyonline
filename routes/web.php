@@ -15,6 +15,8 @@ use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\TenantTestController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\CarImageController;
+use App\Http\Controllers\MarketplaceController;
 
 // Authentication routes (GEEN LOGIN VEREIST)
 Route::get('/login', [AuthController::class, 'showLogin'])->name('auth.login');
@@ -82,6 +84,20 @@ Route::middleware(['auth.simple', 'tenant'])->group(function () {
     Route::post('/employees/{employee}/assign-car', [EmployeeController::class, 'assignCar'])->name('employees.assign-car');
     Route::post('/employees/{employee}/assignments/{assignment}/complete', [EmployeeController::class, 'completeAssignment'])->name('employees.complete-assignment');
     Route::post('/employees/{employee}/assignments/{assignment}/cancel', [EmployeeController::class, 'cancelAssignment'])->name('employees.cancel-assignment');
+
+    // Car Images
+    Route::post('/cars/{car}/images', [CarImageController::class, 'store'])->name('cars.images.store');
+    Route::delete('/images/{carImage}', [CarImageController::class, 'destroy'])->name('cars.images.destroy');
+    Route::post('/images/{carImage}/make-primary', [CarImageController::class, 'makePrimary'])->name('cars.images.make-primary');
+    Route::post('/cars/{car}/images/reorder', [CarImageController::class, 'updateOrder'])->name('cars.images.reorder');
+
+    // Marketplace Publishing
+    Route::get('/cars/{car}/marketplace', [MarketplaceController::class, 'show'])->name('cars.marketplace.show');
+    Route::post('/cars/{car}/marketplace/preview', [MarketplaceController::class, 'preview'])->name('cars.marketplace.preview');
+    Route::post('/cars/{car}/listings', [MarketplaceController::class, 'createListing'])->name('cars.listings.create');
+    Route::post('/listings/{listing}/publish', [MarketplaceController::class, 'publishListing'])->name('listings.publish');
+    Route::get('/listings/{listing}/preview', [MarketplaceController::class, 'previewListing'])->name('listings.preview');
+    Route::delete('/listings/{listing}', [MarketplaceController::class, 'deleteListing'])->name('listings.delete');
 
     // Reports
     Route::get('/rapportage', [ReportsController::class, 'index'])->name('reports.index');

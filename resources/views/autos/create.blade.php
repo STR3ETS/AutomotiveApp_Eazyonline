@@ -22,7 +22,7 @@
                 <p class="text-sm text-gray-600">Vul alle benodigde gegevens in</p>
             </div>
 
-            <form method="POST" action="{{ route('autos.store') }}" class="p-6">
+            <form method="POST" action="{{ route('autos.store') }}" enctype="multipart/form-data" class="p-6">
                 @csrf
 
                 <!-- Error Summary -->
@@ -189,6 +189,36 @@
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
+
+                    <!-- Foto's Upload -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Foto's (optioneel)
+                        </label>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors duration-200" 
+                             id="dropZone">
+                            <input type="file" 
+                                   id="images" 
+                                   name="images[]" 
+                                   multiple 
+                                   accept="image/*" 
+                                   class="hidden">
+                            <div id="dropZoneContent">
+                                <i class="fa-solid fa-cloud-upload-alt text-gray-400 text-4xl mb-4"></i>
+                                <h3 class="text-lg font-medium text-gray-700 mb-2">Sleep foto's hierheen</h3>
+                                <p class="text-gray-500 mb-4">of</p>
+                                <button type="button" 
+                                        onclick="document.getElementById('images').click()" 
+                                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
+                                    Selecteer Foto's
+                                </button>
+                                <p class="text-xs text-gray-500 mt-2">JPG, PNG, WebP - Max 10MB per foto, max 10 foto's</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Selected Images Preview -->
+                        <div id="imagePreview" class="mt-4 gap-4 hidden" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));"></div>
+                    </div>
                 </div>
 
                 <!-- Actions -->
@@ -204,6 +234,7 @@
                             Annuleren
                         </a>
                         <button type="submit" 
+                                id="submitBtn"
                                 class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-200 flex items-center gap-2">
                             <i class="fa-solid fa-save"></i>
                             Auto Toevoegen
@@ -297,6 +328,152 @@ document.getElementById('brand').addEventListener('input', function(e) {
 
 document.getElementById('model').addEventListener('input', function(e) {
     e.target.value = e.target.value.replace(/\b\w/g, l => l.toUpperCase());
+});
+
+// Image upload functionality
+let selectedFiles = [];
+
+// Drag and drop
+const dropZone = document.getElementById('dropZone');
+const imageInput = document.getElementById('images');
+const imagePreview = document.getElementById('imagePreview');
+
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, preventDefaults, false);
+});
+
+function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+}
+
+['dragenter', 'dragover'].forEach(eventName => {
+    dropZone.addEventListener(eventName, highlight, false);
+});
+
+['dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, unhighlight, false);
+});
+
+function highlight(e) {
+    dropZone.classList.add('border-blue-500', 'bg-blue-50');
+}
+
+function unhighlight(e) {
+    dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+}
+
+dropZone.addEventListener('drop', handleDrop, false);
+
+function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    handleFiles(files);
+}
+
+imageInput.addEventListener('change', function(e) {
+    handleFiles(e.target.files);
+});
+
+function handleFiles(files) {
+    [...files].forEach(file => {
+        if (file.type.startsWith('image/') && selectedFiles.length < 10) {
+            selectedFiles.push(file);
+        }
+    });
+    
+    updateImagePreview();
+    updateFileInput();
+}
+
+function updateImagePreview() {
+    imagePreview.innerHTML = '';
+    
+    if (selectedFiles.length > 0) {
+        imagePreview.style.display = 'grid';
+        imagePreview.classList.remove('hidden');
+        
+        selectedFiles.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'relative group';
+                
+                div.innerHTML = `
+                    <img src="${e.target.result}" class="w-full h-24 object-cover rounded-lg border border-gray-200">
+                    <button type="button" 
+                            onclick="removeImage(${index})"
+                            class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                        ×
+                    </button>
+                    <div class="absolute bottom-1 left-1 bg-black bg-opacity-50 text-white text-xs px-1 py-0.5 rounded">
+                        ${Math.round(file.size / 1024)}KB
+                    </div>
+                `;
+                imagePreview.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+    } else {
+        imagePreview.style.display = 'none';
+        imagePreview.classList.add('hidden');
+    }
+}
+
+function removeImage(index) {
+    selectedFiles.splice(index, 1);
+    updateImagePreview();
+    updateFileInput();
+}
+
+function updateFileInput() {
+    // Clear the original input
+    const newInput = document.createElement('input');
+    newInput.type = 'file';
+    newInput.name = 'images[]';
+    newInput.multiple = true;
+    newInput.accept = 'image/*';
+    newInput.className = 'hidden';
+    newInput.id = 'images';
+    
+    // Add event listener
+    newInput.addEventListener('change', function(e) {
+        handleFiles(e.target.files);
+    });
+    
+    // Replace the old input
+    const oldInput = document.getElementById('images');
+    oldInput.parentNode.replaceChild(newInput, oldInput);
+    
+    // Manually set files using a different approach
+    try {
+        const dt = new DataTransfer();
+        selectedFiles.forEach(file => dt.items.add(file));
+        newInput.files = dt.files;
+    } catch (e) {
+        // DataTransfer not supported, create a form data approach
+        console.log('DataTransfer not supported, files will be handled differently');
+    }
+}
+
+// Form submission handler - simplified for debugging
+document.querySelector('form').addEventListener('submit', function(e) {
+    // Don't prevent default - let form submit normally
+    console.log('Form submitting...');
+    
+    // Just add the files to the form before submission
+    const fileInput = document.querySelector('#images');
+    const dataTransfer = new DataTransfer();
+    
+    selectedFiles.forEach(file => {
+        dataTransfer.items.add(file);
+    });
+    
+    fileInput.files = dataTransfer.files;
+    
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Bezig met opslaan...';
+    submitBtn.disabled = true;
 });
 </script>
 @endsection

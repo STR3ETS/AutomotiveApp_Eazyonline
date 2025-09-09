@@ -103,6 +103,26 @@ class Car extends Model
         return $this->hasMany(CarAssignment::class);
     }
 
+    public function images()
+    {
+        return $this->hasMany(CarImage::class);
+    }
+
+    public function primaryImage()
+    {
+        return $this->hasOne(CarImage::class)->where('is_primary', true);
+    }
+
+    public function listings()
+    {
+        return $this->hasMany(CarListing::class);
+    }
+
+    public function activeListings()
+    {
+        return $this->hasMany(CarListing::class)->active();
+    }
+
     public function currentAssignment()
     {
         return $this->hasOne(CarAssignment::class)->where('status', 'active');
@@ -148,4 +168,35 @@ class Car extends Model
     protected $casts = [
         'sold_at' => 'datetime',
     ];
+
+    // Image helper methods
+    public function hasImages(): bool
+    {
+        return $this->images()->count() > 0;
+    }
+
+    public function getPrimaryImageUrl(): ?string
+    {
+        return $this->primaryImage?->url;
+    }
+
+    public function getImagesByCategory(string $category)
+    {
+        return $this->images()->byCategory($category)->ordered()->get();
+    }
+
+    public function addImage(string $filename, array $data = []): CarImage
+    {
+        $data = array_merge($data, [
+            'filename' => $filename,
+            'company_id' => $this->company_id
+        ]);
+
+        // If this is the first image, make it primary
+        if (!$this->hasImages()) {
+            $data['is_primary'] = true;
+        }
+
+        return $this->images()->create($data);
+    }
 }

@@ -94,9 +94,17 @@
                                 <tr class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200">
                                     <td class="px-6 py-4">
                                         <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-12 w-12">
-                                                <div class="h-12 w-12 rounded-full bg-gradient-to-r from-blue-100 to-blue-200 flex items-center justify-center shadow-sm">
-                                                    <i class="fa-solid fa-car text-blue-600 text-lg"></i>
+                                            <div class="flex-shrink-0 h-12 w-16">
+                                                <div class="h-12 w-16 rounded-lg overflow-hidden bg-gray-100">
+                                                    @if($car->primaryImage)
+                                                        <img src="{{ $car->primaryImage->thumbnail_url }}" 
+                                                             alt="{{ $car->primaryImage->alt_text }}"
+                                                             class="w-full h-full object-cover">
+                                                    @else
+                                                        <div class="w-full h-full flex items-center justify-center text-gray-400">
+                                                            <i class="fa-solid fa-car text-lg"></i>
+                                                        </div>
+                                                    @endif
                                                 </div>
                                             </div>
                                             <div class="ml-4">
@@ -106,9 +114,6 @@
                                                 <div class="text-sm text-gray-600">
                                                     {{ $car->brand }} {{ $car->model }}
                                                 </div>
-                                            </div>
-                                        </div>
-                                    </td>
                                             </div>
                                         </div>
                                     </td>
@@ -157,7 +162,7 @@
                                         €{{ number_format($car->price, 0, ',', '.') }}
                                     </td>
                                     <td class="px-6 py-4 text-sm text-gray-500">
-                                        {{ $car->created_at->format('d-m-Y') }}
+                                        {{ $car->created_at ? $car->created_at->format('d-m-Y') : 'Onbekend' }}
                                     </td>
                                     <td class="px-6 py-4 text-right text-sm font-medium space-x-3">
                                         <a href="{{ route('autos.show', $car) }}" 
@@ -170,6 +175,15 @@
                                            title="Bewerken">
                                             <i class="fa-solid fa-edit mr-1"></i> Bewerk
                                         </a>
+                                        @if($car->images->count() > 0)
+                                            <span class="inline-flex items-center px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium" title="{{ $car->images->count() }} foto's">
+                                                <i class="fa-solid fa-images mr-1"></i> {{ $car->images->count() }}
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-500 rounded-full text-xs font-medium" title="Geen foto's">
+                                                <i class="fa-solid fa-image mr-1"></i> 0
+                                            </span>
+                                        @endif
                                         <form method="POST" 
                                               action="{{ route('autos.destroy', $car) }}" 
                                               class="inline"

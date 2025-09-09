@@ -23,6 +23,9 @@ class DatabaseSeeder extends Seeder
         // Seed companies with their data (this will also create car stages)
         $this->call(CompanySeeder::class);
         
+        // Seed car images (must run after CompanySeeder as it creates cars)
+        $this->call(CarImageSeeder::class);
+        
         // Legacy seeders (commented out as they don't support multi-tenancy yet)
         // $this->call(\Database\Seeders\CarStagesTableSeeder::class);
         // $this->call(\Database\Seeders\CarsTableSeeder::class);

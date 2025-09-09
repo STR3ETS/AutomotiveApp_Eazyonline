@@ -40,6 +40,28 @@
                              @dragend="onDragEnd()"
                              :class="{ 'opacity-50 transform rotate-3': draggedCarId === {{ $car->id }} }">
                             
+                            <!-- Car Image -->
+                            @if($car->images->where('is_primary', true)->first())
+                                <div class="mb-3 relative overflow-hidden rounded-lg">
+                                    <a href="{{ route('autos.show', $car) }}" @click.stop>
+                                        <img src="{{ $car->images->where('is_primary', true)->first()->thumbnail_url }}" 
+                                             alt="{{ $car->license_plate }}"
+                                             class="w-full h-32 object-cover hover:scale-105 transition-transform duration-200">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                                        <div class="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                                            Bekijk details
+                                        </div>
+                                    </a>
+                                </div>
+                            @else
+                                <div class="mb-3 bg-gray-100 rounded-lg h-32 flex items-center justify-center">
+                                    <a href="{{ route('autos.show', $car) }}" @click.stop class="text-center">
+                                        <i class="fa-solid fa-image text-gray-400 text-2xl mb-2 block"></i>
+                                        <span class="text-xs text-gray-500">Geen foto</span>
+                                    </a>
+                                </div>
+                            @endif
+                            
                             <!-- Car Header -->
                             <div class="flex items-center gap-3 mb-3">
                                 <div class="w-10 h-10 bg-gradient-to-r from-blue-100 to-blue-200 rounded-full flex items-center justify-center">
