@@ -14,12 +14,21 @@ class Company extends Model
         'name',
         'subdomain',
         'primary_color',
-        'logo_path',
+        'secondary_color',
+        'logo',
+        'email',
+        'phone',
+        'address',
+        'website',
+        'kvk_number',
+        'btw_number',
+        'settings',
         'active'
     ];
 
     protected $casts = [
-        'active' => 'boolean'
+        'active' => 'boolean',
+        'settings' => 'array',
     ];
 
     // Relationships
@@ -137,5 +146,69 @@ class Company extends Model
         }
 
         return sprintf("#%02x%02x%02x", round($r * 255), round($g * 255), round($b * 255));
+    }
+
+    // Helper methods for settings
+    public function getSetting(string $key, $default = null)
+    {
+        return data_get($this->settings, $key, $default);
+    }
+
+    public function getOpeningHours(): array
+    {
+        return $this->getSetting('opening_hours', [
+            'monday' => ['open' => '08:00', 'close' => '17:00'],
+            'tuesday' => ['open' => '08:00', 'close' => '17:00'],
+            'wednesday' => ['open' => '08:00', 'close' => '17:00'],
+            'thursday' => ['open' => '08:00', 'close' => '17:00'],
+            'friday' => ['open' => '08:00', 'close' => '17:00'],
+            'saturday' => ['open' => '09:00', 'close' => '16:00'],
+            'sunday' => ['open' => '', 'close' => ''], // Closed
+        ]);
+    }
+
+    public function getRepairHourlyRate(): float
+    {
+        return (float) $this->getSetting('repair_hourly_rate', 75.00);
+    }
+
+    public function getMaxAppointmentsPerDay(): int
+    {
+        return (int) $this->getSetting('max_appointments_per_day', 10);
+    }
+
+    public function getDefaultAppointmentDuration(): int
+    {
+        return (int) $this->getSetting('default_appointment_duration', 60);
+    }
+
+    public function getCurrency(): string
+    {
+        return $this->getSetting('currency', 'EUR');
+    }
+
+    public function getTaxRate(): float
+    {
+        return (float) $this->getSetting('tax_rate', 21.0);
+    }
+
+    public function getInvoicePrefix(): string
+    {
+        return $this->getSetting('invoice_prefix', 'INV');
+    }
+
+    public function isAutoProgressEnabled(): bool
+    {
+        return (bool) $this->getSetting('auto_progress_enabled', false);
+    }
+
+    public function isMarketplaceAutoPublishEnabled(): bool
+    {
+        return (bool) $this->getSetting('marketplace_auto_publish', false);
+    }
+
+    public function getLogoUrl(): ?string
+    {
+        return $this->logo ? asset('storage/' . $this->logo) : null;
     }
 }

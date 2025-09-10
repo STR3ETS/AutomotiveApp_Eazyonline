@@ -9,36 +9,59 @@
             <p class="text-gray-600">Sleep auto's tussen de verschillende fases om je voorraad te beheren</p>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-{{ count($stages) }} gap-6" x-data="pipelineDrag()">
+        <div class="space-y-8" x-data="pipelineDrag()">
             @foreach($stages as $stage)
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 min-h-[500px] flex flex-col hover-stage" 
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover-stage" 
                      x-data="{ stageId: {{ $stage->id }} }" 
                      @dragover.prevent 
                      @drop="onDrop($event, stageId)"
-                     :class="{ 'ring-2 ring-blue-300 bg-blue-50 transform scale-105': draggedCarId && hoveredStage === stageId }"
+                     :class="{ 'ring-2 ring-blue-300 bg-blue-50': draggedCarId && hoveredStage === stageId }"
                      @dragenter="hoveredStage = stageId"
                      @dragleave="if ($event.target === $el) hoveredStage = null">
                     
-                    <div class="flex items-center justify-between mb-6 p-2">
-                        <h2 class="font-bold text-lg text-gray-800">{{ $stage->name }}</h2>
+                    <!-- Stage Header -->
+                    <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                @if($stage->name === 'Intake')
+                                    <i class="fa-solid fa-clipboard-list text-white text-lg"></i>
+                                @elseif($stage->name === 'Technische controle')
+                                    <i class="fa-solid fa-tools text-white text-lg"></i>
+                                @elseif($stage->name === 'Herstel & Onderhoud')
+                                    <i class="fa-solid fa-wrench text-white text-lg"></i>
+                                @elseif($stage->name === 'Commercieel gereed')
+                                    <i class="fa-solid fa-camera text-white text-lg"></i>
+                                @elseif($stage->name === 'Verkoop klaar')
+                                    <i class="fa-solid fa-handshake text-white text-lg"></i>
+                                @else
+                                    <i class="fa-solid fa-car text-white text-lg"></i>
+                                @endif
+                            </div>
+                            <div>
+                                <h2 class="text-xl font-bold text-gray-900">{{ $stage->name }}</h2>
+                                <p class="text-sm text-gray-600">{{ $stage->description ?? 'Fase in het productieproces' }}</p>
+                            </div>
+                        </div>
                         <div class="flex items-center gap-2">
-                            <span class="bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full shadow-sm">
-                                {{ $stage->cars->count() }} auto's
+                            <span class="bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 text-sm font-semibold px-4 py-2 rounded-full shadow-sm">
+                                {{ $stage->cars->count() }} auto{{ $stage->cars->count() !== 1 ? "'s" : '' }}
                             </span>
                         </div>
                     </div>
                 
-                <div class="flex flex-wrap gap-3 flex-1">
+                <!-- Horizontal scrolling car cards -->
+                <div class="overflow-x-auto">
+                    <div class="flex gap-4 pb-4" style="min-width: max-content;">
                     @forelse($stage->cars as $car)
                         @php
                             $completion = $car->stage_completion;
                             $canMove = $car->canMoveToNextStage();
                         @endphp
-                        <div class="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-sm p-4 cursor-move border border-gray-200 hover:shadow-lg hover:border-blue-300 transition-all duration-300 w-full sm:w-64 flex-shrink-0 car-card" 
+                        <div class="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-sm p-4 cursor-move border border-gray-200 hover:shadow-lg hover:border-blue-300 transition-all duration-300 w-72 flex-shrink-0 car-card" 
                              draggable="true" 
                              @dragstart="onDragStart($event, {{ $car->id }})"
                              @dragend="onDragEnd()"
-                             :class="{ 'opacity-50 transform rotate-3': draggedCarId === {{ $car->id }} }">
+                             :class="{ 'opacity-50 transform rotate-1': draggedCarId === {{ $car->id }} }">
                             
                             <!-- Car Image -->
                             @if($car->images->where('is_primary', true)->first())
@@ -123,12 +146,13 @@
                             </div>
                         </div>
                     @empty
-                        <div class="text-gray-400 text-center py-16 border-2 border-dashed border-gray-200 rounded-xl w-full hover:border-gray-300 transition-colors duration-300">
-                            <div class="text-4xl mb-3">📋</div>
+                        <div class="text-gray-400 text-center py-12 px-8 border-2 border-dashed border-gray-200 rounded-xl hover:border-gray-300 transition-colors duration-300 min-w-[300px]">
+                            <div class="text-3xl mb-2">📋</div>
                             <div class="text-sm font-medium text-gray-600 mb-1">Geen auto's in deze fase</div>
                             <div class="text-xs text-gray-500">Sleep een auto hiernaartoe om te beginnen</div>
                         </div>
                     @endforelse
+                    </div>
                 </div>
             </div>
         @endforeach
@@ -147,6 +171,11 @@
     to { transform: translateY(0); opacity: 1; }
 }
 
+@keyframes slideInRight {
+    from { transform: translateX(-30px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
 @keyframes wiggle {
     0%, 100% { transform: rotate(0deg); }
     25% { transform: rotate(1deg); }
@@ -158,7 +187,7 @@
     50% { opacity: 0.7; }
 }
 
-/* Stage column animations */
+/* Stage row animations */
 .hover-stage {
     animation: slideInDown 0.6s ease-out;
 }
@@ -171,7 +200,7 @@
 
 /* Car card animations */
 .car-card {
-    animation: slideInUp 0.5s ease-out;
+    animation: slideInRight 0.5s ease-out;
 }
 
 .car-card:hover {
@@ -184,15 +213,19 @@
     animation: wiggle 0.2s ease-in-out infinite;
 }
 
-/* Staggered animations */
+/* Staggered animations for stages */
 .hover-stage:nth-child(1) { animation-delay: 0.1s; }
 .hover-stage:nth-child(2) { animation-delay: 0.2s; }
 .hover-stage:nth-child(3) { animation-delay: 0.3s; }
 .hover-stage:nth-child(4) { animation-delay: 0.4s; }
 .hover-stage:nth-child(5) { animation-delay: 0.5s; }
 
-.car-card:nth-child(odd) { animation-delay: 0.1s; }
-.car-card:nth-child(even) { animation-delay: 0.15s; }
+/* Staggered animations for cards */
+.car-card:nth-child(1) { animation-delay: 0.1s; }
+.car-card:nth-child(2) { animation-delay: 0.15s; }
+.car-card:nth-child(3) { animation-delay: 0.2s; }
+.car-card:nth-child(4) { animation-delay: 0.25s; }
+.car-card:nth-child(5) { animation-delay: 0.3s; }
 
 /* Progress bar animation */
 .car-card .h-2 {
@@ -208,6 +241,37 @@
 /* Drag hover effects */
 .ring-2.ring-blue-300 {
     animation: pulse 1s ease-in-out infinite;
+}
+
+/* Horizontal scrolling enhancement */
+.overflow-x-auto {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e0 #f7fafc;
+}
+
+.overflow-x-auto::-webkit-scrollbar {
+    height: 8px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+    background: #f7fafc;
+    border-radius: 4px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 4px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .car-card {
+        width: 260px !important;
+    }
 }
 </style>
 
@@ -234,18 +298,18 @@ function pipelineDrag() {
             this.scrollInterval = setInterval(() => {
                 if (!this.draggedCarId) return;
                 
-                const mouseX = event.clientX;
+                const mouseY = window.dragY || 0;
                 const scrollContainer = document.documentElement;
                 const scrollSpeed = 10;
                 const scrollZone = 100; // pixels from edge
                 
-                // Scroll left
-                if (mouseX < scrollZone) {
-                    scrollContainer.scrollLeft -= scrollSpeed;
+                // Scroll up
+                if (mouseY < scrollZone) {
+                    scrollContainer.scrollTop -= scrollSpeed;
                 }
-                // Scroll right
-                else if (mouseX > window.innerWidth - scrollZone) {
-                    scrollContainer.scrollLeft += scrollSpeed;
+                // Scroll down
+                else if (mouseY > window.innerHeight - scrollZone) {
+                    scrollContainer.scrollTop += scrollSpeed;
                 }
             }, 16); // ~60fps
         },
@@ -329,7 +393,7 @@ function pipelineDrag() {
 
 // Global mouse tracking for auto-scroll
 document.addEventListener('dragover', (e) => {
-    window.dragX = e.clientX;
+    window.dragY = e.clientY;
 });
 </script>
 @endsection

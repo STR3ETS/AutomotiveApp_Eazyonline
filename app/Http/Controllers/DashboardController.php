@@ -52,12 +52,25 @@ class DashboardController extends Controller
                 return $appointment;
             });
 
+        // Vandaag agenda - haal alleen afspraken van vandaag op
+        $today = Carbon::now()->format('Y-m-d');
+        $todayAppointments = Appointment::with(['car', 'customer'])
+            ->where('date', $today)
+            ->orderBy('time')
+            ->get()
+            ->map(function ($appointment) {
+                $appointmentDate = Carbon::parse($appointment->date . ' ' . $appointment->time);
+                $appointment->formatted_date = $appointmentDate;
+                return $appointment;
+            });
+
         return view('dashboard.index', [
             'totalCars' => $totalCars,
             'intakeCars' => $intakeCars,
             'liveAds' => $liveAds,
             'openRepairs' => $openRepairs,
             'weekAppointments' => $weekAppointments,
+            'todayAppointments' => $todayAppointments,
         ]);
     }
     

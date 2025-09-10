@@ -106,6 +106,10 @@ Route::middleware(['auth.simple', 'tenant'])->group(function () {
     Route::get('/admin/theme', [ThemeController::class, 'showThemeSettings'])->name('admin.theme');
     Route::post('/admin/theme', [ThemeController::class, 'updateThemeSettings'])->name('admin.theme.update');
 
+    // Company Settings
+    Route::get('/company-settings', [App\Http\Controllers\CompanySettingsController::class, 'index'])->name('company-settings.index');
+    Route::put('/company-settings', [App\Http\Controllers\CompanySettingsController::class, 'update'])->name('company-settings.update');
+
     // Tenant test routes (for testing only)
     Route::get('/tenant-test', [TenantTestController::class, 'index'])->name('tenant.test');
     Route::get('/set-tenant/{company}', [TenantTestController::class, 'setTenant'])->name('tenant.set');

@@ -12,8 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('car_listings', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('car_id')->constrained()->onDelete('cascade');
+            $table->id();            $table->foreignId('car_id')->constrained()->onDelete('cascade');
             $table->foreignId('company_id')->constrained()->onDelete('cascade');
             $table->foreignId('listing_template_id')->constrained()->onDelete('cascade');
             $table->enum('platform', ['marktplaats', 'instagram', 'facebook', 'autotrack', 'custom']);
