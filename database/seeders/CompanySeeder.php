@@ -13,7 +13,6 @@ use App\Models\Repair;
 use App\Models\Part;
 use App\Models\Sale;
 use App\Models\CarStage;
-use App\Models\Employee;
 
 class CompanySeeder extends Seeder
 {
@@ -70,7 +69,6 @@ class CompanySeeder extends Seeder
             'user_email' => 'piet@autogaragepiet.nl',
             'cars_count' => 8,
             'customers_count' => 12,
-            'employees_count' => 4,
         ]);
 
         // Company 2: De Snelle Garage
@@ -88,7 +86,6 @@ class CompanySeeder extends Seeder
             'user_email' => 'mark@desnellegarage.nl',
             'cars_count' => 6,
             'customers_count' => 8,
-            'employees_count' => 3,
         ]);
 
         // Company 3: Premium Motors
@@ -106,7 +103,6 @@ class CompanySeeder extends Seeder
             'user_email' => 'lisa@premiummotors.nl',
             'cars_count' => 12,
             'customers_count' => 15,
-            'employees_count' => 5,
         ]);
 
         // Company 4: Buurgarage Jan
@@ -124,7 +120,6 @@ class CompanySeeder extends Seeder
             'user_email' => 'jan@buurgaragejan.nl',
             'cars_count' => 4,
             'customers_count' => 6,
-            'employees_count' => 2,
         ]);
 
         echo "✅ Created 4 companies with users, cars, customers, and appointments!\n";
@@ -158,29 +153,6 @@ class CompanySeeder extends Seeder
                 'address' => 'Voorbeeldstraat ' . rand(1, 100) . ', 1234AB Voorbeeldstad',
                 'company_id' => $company->id,
             ]);
-        }
-
-        // Create employees
-        $employees = [];
-        $employeeData = [
-            ['name' => 'Marco van der Berg', 'position' => 'Hoofdmonteur', 'specializations' => ['APK', 'Diagnose', 'Motor']],
-            ['name' => 'Dennis Janssen', 'position' => 'Monteur', 'specializations' => ['Remmen', 'Uitlaat', 'Banden']],
-            ['name' => 'Kevin Smit', 'position' => 'APK-keurder', 'specializations' => ['APK', 'Controle']],
-            ['name' => 'Roy Bakker', 'position' => 'Leerling', 'specializations' => ['Onderhoud', 'Controle']],
-            ['name' => 'Patrick de Vries', 'position' => 'Monteur', 'specializations' => ['Carrosserie', 'Lakwerk']],
-        ];
-
-        foreach ($employeeData as $index => $empData) {
-            if ($index < $config['employees_count']) {
-                $employees[] = Employee::create([
-                    'name' => $empData['name'],
-                    'email' => strtolower(str_replace(' ', '.', $empData['name'])) . '@' . $company->subdomain . '.nl',
-                    'phone' => '06' . rand(10000000, 99999999),
-                    'position' => $empData['position'],
-                    'specializations' => $empData['specializations'],
-                    'company_id' => $company->id,
-                ]);
-            }
         }
 
         // Create cars with different statuses

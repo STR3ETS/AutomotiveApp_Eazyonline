@@ -17,6 +17,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\CarImageController;
 use App\Http\Controllers\MarketplaceController;
+use Illuminate\Support\Facades\Auth;
 
 // Authentication routes (GEEN LOGIN VEREIST)
 Route::get('/login', [AuthController::class, 'showLogin'])->name('auth.login');
@@ -25,7 +26,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
 
 // Redirect root to login
 Route::get('/', function() {
-    if (session('authenticated')) {
+    if (Auth::check()) {
         return redirect()->route('dashboard');
     }
     return redirect()->route('auth.login');
@@ -35,7 +36,7 @@ Route::get('/', function() {
 Route::get('/css/company/{subdomain}.css', [ThemeController::class, 'generateCSS'])->name('company.css');
 
 // ALLE ANDERE ROUTES VEREISEN LOGIN
-Route::middleware(['auth.simple', 'tenant'])->group(function () {
+Route::middleware(['auth', 'tenant'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
@@ -69,21 +70,33 @@ Route::middleware(['auth.simple', 'tenant'])->group(function () {
     Route::put('/parts/{part}', [RepairController::class, 'updatePart'])->name('parts.update');
     Route::delete('/parts/{part}', [RepairController::class, 'destroyPart'])->name('parts.destroy');
 
-    // Sales
-    Route::resource('sales', SalesController::class);
-    Route::post('/sales/{sale}/deliver', [SalesController::class, 'markAsDelivered'])->name('sales.deliver');
-    Route::post('/sales/{sale}/cancel', [SalesController::class, 'cancel'])->name('sales.cancel');
+    // Customers - Only owners
+    Route::middleware('can:manage.company')->group(function () {
+        Route::resource('customers', CustomerController::class);
+    });
+
+    // Sales routes - Reports only for owners, but medewerkers can see basic sales status
     Route::get('/verkoop-klaar', [SalesReadyController::class, 'index'])->name('sales-ready.index');
     Route::get('/actieve-verkoop', [ActiveSalesController::class, 'index'])->name('active-sales.index');
+    
+    // Sales management - Only owners
+    Route::middleware('can:view.reports')->group(function () {
+        Route::resource('sales', SalesController::class);
+        Route::post('/sales/{sale}/deliver', [SalesController::class, 'markAsDelivered'])->name('sales.deliver');
+        Route::post('/sales/{sale}/cancel', [SalesController::class, 'cancel'])->name('sales.cancel');
+    });
 
-    // Customers
-    Route::resource('customers', CustomerController::class);
-
-    // Employees
-    Route::resource('employees', EmployeeController::class);
-    Route::post('/employees/{employee}/assign-car', [EmployeeController::class, 'assignCar'])->name('employees.assign-car');
+    // Employees - Position-based access
+    Route::get('/employees', [EmployeeController::class, 'index'])->middleware('can:manage.company')->name('employees.index');
+    Route::get('/employees/create', [EmployeeController::class, 'create'])->middleware('can:manage.company')->name('employees.create');
+    Route::post('/employees', [EmployeeController::class, 'store'])->middleware('can:manage.company')->name('employees.store');
+    Route::get('/employees/{employee}', [EmployeeController::class, 'show'])->name('employees.show'); // Everyone can view their own
+    Route::get('/employees/{employee}/edit', [EmployeeController::class, 'edit'])->middleware('can:manage.company')->name('employees.edit');
+    Route::put('/employees/{employee}', [EmployeeController::class, 'update'])->middleware('can:manage.company')->name('employees.update');
+    Route::delete('/employees/{employee}', [EmployeeController::class, 'destroy'])->middleware('can:manage.company')->name('employees.destroy');
+    Route::post('/employees/{employee}/assign-car', [EmployeeController::class, 'assignCar'])->middleware('can:assign.work')->name('employees.assign-car');
     Route::post('/employees/{employee}/assignments/{assignment}/complete', [EmployeeController::class, 'completeAssignment'])->name('employees.complete-assignment');
-    Route::post('/employees/{employee}/assignments/{assignment}/cancel', [EmployeeController::class, 'cancelAssignment'])->name('employees.cancel-assignment');
+    Route::post('/employees/{employee}/assignments/{assignment}/cancel', [EmployeeController::class, 'cancelAssignment'])->middleware('can:assign.work')->name('employees.cancel-assignment');
 
     // Car Images
     Route::post('/cars/{car}/images', [CarImageController::class, 'store'])->name('cars.images.store');
@@ -99,16 +112,16 @@ Route::middleware(['auth.simple', 'tenant'])->group(function () {
     Route::get('/listings/{listing}/preview', [MarketplaceController::class, 'previewListing'])->name('listings.preview');
     Route::delete('/listings/{listing}', [MarketplaceController::class, 'deleteListing'])->name('listings.delete');
 
-    // Reports
-    Route::get('/rapportage', [ReportsController::class, 'index'])->name('reports.index');
+    // Reports - Only owners
+    Route::get('/rapportage', [ReportsController::class, 'index'])->middleware('can:view.reports')->name('reports.index');
 
-    // Theme settings
-    Route::get('/admin/theme', [ThemeController::class, 'showThemeSettings'])->name('admin.theme');
-    Route::post('/admin/theme', [ThemeController::class, 'updateThemeSettings'])->name('admin.theme.update');
+    // Theme settings - Only owners
+    Route::get('/admin/theme', [ThemeController::class, 'showThemeSettings'])->middleware('can:manage.company')->name('admin.theme');
+    Route::post('/admin/theme', [ThemeController::class, 'updateThemeSettings'])->middleware('can:manage.company')->name('admin.theme.update');
 
-    // Company Settings
-    Route::get('/company-settings', [App\Http\Controllers\CompanySettingsController::class, 'index'])->name('company-settings.index');
-    Route::put('/company-settings', [App\Http\Controllers\CompanySettingsController::class, 'update'])->name('company-settings.update');
+    // Company Settings - Only owners
+    Route::get('/company-settings', [App\Http\Controllers\CompanySettingsController::class, 'index'])->middleware('can:manage.company')->name('company-settings.index');
+    Route::put('/company-settings', [App\Http\Controllers\CompanySettingsController::class, 'update'])->middleware('can:manage.company')->name('company-settings.update');
 
     // Tenant test routes (for testing only)
     Route::get('/tenant-test', [TenantTestController::class, 'index'])->name('tenant.test');

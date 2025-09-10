@@ -6,7 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\Car;
 use App\Models\CarAssignment;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class EmployeeController extends Controller
 {
@@ -67,12 +70,45 @@ class EmployeeController extends Controller
             'position' => 'required|string|max:100',
             'specializations' => 'nullable|array',
             'specializations.*' => 'string|max:100',
+            'create_user_account' => 'boolean',
+            'user_role' => 'required_if:create_user_account,1|in:employee,manager',
         ]);
 
-        Employee::create($validated);
+        // Create employee first
+        $employee = Employee::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'],
+            'position' => $validated['position'],
+            'specializations' => $validated['specializations'] ?? [],
+            'role' => $validated['user_role'] ?? 'employee',
+        ]);
 
-        return redirect()->route('employees.index')
-            ->with('success', 'Medewerker succesvol toegevoegd!');
+        // Create user account if requested
+        if ($request->boolean('create_user_account')) {
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'] ?: $this->generateEmployeeEmail($employee),
+                'password' => Hash::make('password123'), // Default password
+                'company_id' => tenant_id(),
+                'role' => $validated['user_role'],
+                'active' => true,
+            ]);
+
+            $employee->update(['user_id' => $user->id]);
+
+            $message = "Medewerker succesvol toegevoegd met login account! (Wachtwoord: password123)";
+        } else {
+            $message = "Medewerker succesvol toegevoegd!";
+        }
+
+        return redirect()->route('employees.index')->with('success', $message);
+    }
+
+    private function generateEmployeeEmail(Employee $employee): string
+    {
+        $cleanName = strtolower(str_replace(' ', '.', $employee->name));
+        return $cleanName . '@' . $employee->company->subdomain . '.nl';
     }
 
     /**
@@ -80,6 +116,12 @@ class EmployeeController extends Controller
      */
     public function show(Employee $employee)
     {
+        // Check if current user can view this employee
+        $user = Auth::user();
+        if ($user->canOnlyViewOwnWork() && $user->employee && $user->employee->id !== $employee->id) {
+            abort(403, 'Je kunt alleen je eigen gegevens bekijken.');
+        }
+
         $employee->load([
             'carAssignments.car',
             'currentAssignments.car.stage'

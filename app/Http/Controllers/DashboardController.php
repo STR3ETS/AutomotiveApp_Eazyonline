@@ -9,11 +9,18 @@ use App\Models\Repair;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
     public function index()
     {
+        $user = Auth::user();
+
+        // Remove automatic redirect for employees - they can see dashboard
+        // if ($user->isEmployee() && $user->employee) {
+        //     return redirect()->route('employees.show', $user->employee);
+        // }
         // Totaal aantal auto's
         $totalCars = Car::count();
         

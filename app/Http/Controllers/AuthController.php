@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Company;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -16,47 +18,65 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'username' => 'required|string',
+            'email' => 'required|email',
             'password' => 'required|string',
         ]);
 
-        // Simple hardcoded credentials for each company
-        $credentials = [
-            'piet' => ['password' => 'piet123', 'company_id' => 1],
-            'snelle' => ['password' => 'snelle123', 'company_id' => 2],
-            'premium' => ['password' => 'premium123', 'company_id' => 3],
-            'jan' => ['password' => 'jan123', 'company_id' => 4],
-        ];
-
-        $username = $request->username;
-        $password = $request->password;
-
-        if (isset($credentials[$username]) && $credentials[$username]['password'] === $password) {
-            $companyId = $credentials[$username]['company_id'];
-            $company = Company::find($companyId);
-
-            if ($company) {
-                // Store in session
-                session([
-                    'authenticated' => true,
-                    'current_company_id' => $company->id,
-                    'username' => $username
-                ]);
-
-                // Store in app container
-                app()->instance('current_company', $company);
-                config(['app.current_company_id' => $company->id]);
-
-                return redirect()->route('dashboard')->with('success', "Welkom bij {$company->name}!");
+        $credentials = $request->only('email', 'password');
+        
+        // Try to authenticate the user
+        if (Auth::attempt($credentials)) {
+            $user = Auth::user();
+            
+            // Check if user is active
+            if (!$user->active) {
+                Auth::logout();
+                return back()->withErrors(['Je account is gedeactiveerd.']);
             }
+
+            // Check if company is active
+            if (!$user->company->active) {
+                Auth::logout();
+                return back()->withErrors(['Je bedrijf is gedeactiveerd.']);
+            }
+
+            // Update last login
+            $user->last_login_at = now();
+            $user->save();
+
+            // Set tenant context
+            $this->setTenantContext($user->company);
+
+            $request->session()->regenerate();
+
+            return redirect()->intended(route('dashboard'))
+                ->with('success', "Welkom terug, {$user->name}!");
         }
 
         return back()->withErrors(['De inloggegevens zijn niet correct.']);
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
-        session()->flush();
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        
         return redirect()->route('auth.login')->with('success', 'Je bent uitgelogd.');
+    }
+
+    private function setTenantContext(Company $company): void
+    {
+        // Store current company in app container
+        app()->instance('current_company', $company);
+        
+        // Store in session for persistence
+        session(['current_company_id' => $company->id]);
+        
+        // Store in config for easy access
+        config(['app.current_company_id' => $company->id]);
+        
+        // Add company info to view
+        view()->share('currentCompany', $company);
     }
 }

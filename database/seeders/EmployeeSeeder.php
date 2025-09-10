@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Company;
 use App\Models\Employee;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class EmployeeSeeder extends Seeder
 {
@@ -24,75 +26,136 @@ class EmployeeSeeder extends Seeder
 
     private function seedEmployeesForCompany(Company $company): void
     {
-        // Employee data templates
-        $employeeTemplates = [
-            [
-                'name' => 'Marco van der Berg', 
-                'position' => 'Hoofdmonteur', 
-                'specializations' => ['APK', 'Diagnose', 'Motor']
-            ],
-            [
-                'name' => 'Dennis Janssen', 
-                'position' => 'Monteur', 
-                'specializations' => ['Remmen', 'Uitlaat', 'Banden']
-            ],
-            [
-                'name' => 'Kevin Smit', 
-                'position' => 'APK-keurder', 
-                'specializations' => ['APK', 'Controle']
-            ],
-            [
-                'name' => 'Roy Bakker', 
-                'position' => 'Leerling', 
-                'specializations' => ['Onderhoud', 'Controle']
-            ],
-            [
-                'name' => 'Patrick de Vries', 
-                'position' => 'Monteur', 
-                'specializations' => ['Carrosserie', 'Lakwerk']
-            ],
-        ];
+        // Create owner first
+        $this->createOwner($company);
+        
+        // Create medewerkers
+        $employeeTemplates = $this->getEmployeeTemplatesForCompany($company->subdomain);
 
-        // Determine how many employees based on company size
+        // Determine how many medewerkers based on company size
         $employeeCount = match($company->subdomain) {
-            'piet' => 4,
-            'snelle' => 3,
-            'premium' => 5,
+            'piet' => 3,
+            'snelle' => 2,
+            'premium' => 4,
             'buurgarage' => 2,
-            default => 3,
+            default => 2,
         };
 
         for ($i = 0; $i < $employeeCount; $i++) {
-            $template = $employeeTemplates[$i];
-            
-            // Personalize name for each company
-            $firstName = explode(' ', $template['name'])[0];
-            $lastName = explode(' ', $template['name'])[1] ?? 'van der Berg';
-            
-            // Create unique names per company
-            $uniqueName = match($company->subdomain) {
-                'piet' => $template['name'],
-                'snelle' => $firstName . ' Jansen',
-                'premium' => $firstName . ' de Vries', 
-                'buurgarage' => $firstName . ' Bakker',
-                default => $template['name'],
-            };
-
-            Employee::firstOrCreate(
-                [
-                    'name' => $uniqueName,
-                    'company_id' => $company->id
-                ],
-                [
-                    'email' => strtolower(str_replace(' ', '.', $uniqueName)) . '@' . $company->subdomain . '.nl',
-                    'phone' => '06' . rand(10000000, 99999999),
-                    'position' => $template['position'],
-                    'specializations' => $template['specializations'],
-                    'active' => true,
-                ]
-            );
+            if (isset($employeeTemplates[$i])) {
+                $this->createMedewerker($company, $employeeTemplates[$i]);
+            }
         }
 
-        echo "   Created {$employeeCount} employees for {$company->name}\n";
+        $totalEmployees = $employeeCount + 1;
+        echo "   Created {$totalEmployees} employees for {$company->name}\n";
+    }
+
+    private function getEmployeeTemplatesForCompany(string $subdomain): array
+    {
+        return match($subdomain) {
+            'piet' => [
+                ['name' => 'Marco van der Berg'],
+                ['name' => 'Dennis Janssen'],
+                ['name' => 'Kevin de Wit'],
+            ],
+            'snelle' => [
+                ['name' => 'Sven Jansen'],
+                ['name' => 'Rick Vermeer'],
+            ],
+            'premium' => [
+                ['name' => 'Alexander van Houten'],
+                ['name' => 'Sebastiaan de Graaf'],
+                ['name' => 'Martijn Wolters'],
+                ['name' => 'Thomas van Beek'],
+            ],
+            'buurgarage' => [
+                ['name' => 'Henk Bakker'],
+                ['name' => 'Lars Visser'],
+            ],
+            default => [],
+        };
+    }
+
+    private function createOwner(Company $company): void
+    {
+        // Get owner name based on company
+        $ownerName = match($company->subdomain) {
+            'piet' => 'Piet van der Berg',
+            'snelle' => 'Mark Jansen',
+            'premium' => 'Lisa de Vries',
+            'buurgarage' => 'Jan Bakker',
+            default => 'Eigenaar ' . $company->name,
+        };
+
+        // Create owner user account
+        $ownerEmail = match($company->subdomain) {
+            'piet' => 'piet@autogaragepiet.nl',
+            'snelle' => 'mark@desnellegarage.nl',
+            'premium' => 'lisa@premiummotors.nl',
+            'buurgarage' => 'jan@buurgaragejan.nl',
+            default => 'eigenaar@' . $company->subdomain . '.nl',
+        };
+
+        $ownerUser = User::firstOrCreate(
+            ['email' => $ownerEmail],
+            [
+                'name' => $ownerName,
+                'password' => Hash::make('password123'),
+                'email_verified_at' => now(),
+                'company_id' => $company->id,
+                'role' => 'eigenaar', // ✅ FIXED
+                'active' => true,
+            ]
+        );
+
+        // Create owner employee record
+        Employee::firstOrCreate(
+            [
+                'company_id' => $company->id,
+                'user_id' => $ownerUser->id
+            ],
+            [
+                'name' => $ownerName,
+                'email' => $ownerEmail,
+                'phone' => '06' . rand(10000000, 99999999),
+                'position' => 'eigenaar',
+                'role' => 'eigenaar', // ✅ FIXED
+                'active' => true,
+            ]
+        );
+    }
+
+    private function createMedewerker(Company $company, array $template): void
+    {
+        // Create user account for medewerker
+        $email = strtolower(str_replace(' ', '.', $template['name'])) . '@' . $company->subdomain . '.nl';
+        $user = User::firstOrCreate(
+            ['email' => $email],
+            [
+                'name' => $template['name'],
+                'password' => Hash::make('password123'),
+                'email_verified_at' => now(),
+                'company_id' => $company->id,
+                'role' => 'medewerker', // ✅ FIXED
+                'active' => true,
+            ]
+        );
+
+        // Create employee record
+        Employee::firstOrCreate(
+            [
+                'company_id' => $company->id,
+                'user_id' => $user->id
+            ],
+            [
+                'name' => $template['name'],
+                'email' => $email,
+                'phone' => '06' . rand(10000000, 99999999),
+                'position' => 'medewerker',
+                'role' => 'medewerker', // ✅ FIXED
+                'active' => true,
+            ]
+        );
     }
 }

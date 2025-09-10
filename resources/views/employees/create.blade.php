@@ -117,6 +117,43 @@
                         @enderror
                         <p class="mt-2 text-xs text-[var(--text-secondary)]">Selecteer de specialisaties van deze medewerker</p>
                     </div>
+
+                    <!-- Login Toegang -->
+                    <div class="md:col-span-2">
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <h4 class="font-medium text-blue-900 mb-3">🔐 Login Toegang</h4>
+                            
+                            <label class="flex items-center mb-4">
+                                <input type="checkbox" 
+                                       id="create_user_account"
+                                       name="create_user_account" 
+                                       value="1"
+                                       {{ old('create_user_account') ? 'checked' : '' }}
+                                       class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                                <span class="ml-2 text-sm text-blue-900">Maak een login account aan voor deze medewerker</span>
+                            </label>
+                            
+                            <div id="user_role_section" style="display: none;">
+                                <label for="user_role" class="block text-sm font-medium text-blue-900 mb-2">
+                                    Rol <span class="text-red-500">*</span>
+                                </label>
+                                <select id="user_role" 
+                                        name="user_role" 
+                                        class="w-full px-3 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">Selecteer een rol</option>
+                                    <option value="employee" {{ old('user_role') == 'employee' ? 'selected' : '' }}>Medewerker (Beperkte toegang)</option>
+                                    <option value="manager" {{ old('user_role') == 'manager' ? 'selected' : '' }}>Voorman (Bijna alle rechten)</option>
+                                </select>
+                                @error('user_role')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                                <div class="mt-2 text-xs text-blue-700">
+                                    <div><strong>Medewerker:</strong> Kan alleen eigen werk bekijken</div>
+                                    <div><strong>Voorman:</strong> Kan alles behalve bedrijfsinstellingen wijzigen</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Actions -->
@@ -142,4 +179,26 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const createAccountCheckbox = document.getElementById('create_user_account');
+    const roleSection = document.getElementById('user_role_section');
+    const roleSelect = document.getElementById('user_role');
+    
+    function toggleRoleSection() {
+        if (createAccountCheckbox.checked) {
+            roleSection.style.display = 'block';
+            roleSelect.required = true;
+        } else {
+            roleSection.style.display = 'none';
+            roleSelect.required = false;
+            roleSelect.value = '';
+        }
+    }
+    
+    createAccountCheckbox.addEventListener('change', toggleRoleSection);
+    toggleRoleSection(); // Initialize state
+});
+</script>
 @endsection

@@ -15,10 +15,10 @@
             @csrf
             <div class="rounded-md shadow-sm -space-y-px">
                 <div>
-                    <label for="username" class="sr-only">Gebruikersnaam</label>
-                    <input id="username" name="username" type="text" required 
+                    <label for="email" class="sr-only">Email</label>
+                    <input id="email" name="email" type="email" required 
                            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" 
-                           placeholder="Gebruikersnaam" value="{{ old('username') }}">
+                           placeholder="Email adres" value="{{ old('email') }}">
                 </div>
                 <div>
                     <label for="password" class="sr-only">Wachtwoord</label>
@@ -47,10 +47,18 @@
             <div class="bg-blue-50 border border-blue-200 rounded p-4 mt-4">
                 <h4 class="font-semibold text-blue-800 mb-2">Test Inloggegevens:</h4>
                 <div class="text-sm text-blue-700 space-y-1">
-                    <div><strong>AutoGarage Piet:</strong> piet / piet123</div>
-                    <div><strong>De Snelle Garage:</strong> snelle / snelle123</div>
-                    <div><strong>Premium Motors:</strong> premium / premium123</div>
-                    <div><strong>Buurgarage Jan:</strong> jan / jan123</div>
+                    <div class="font-semibold text-blue-800 mb-2">Eigenaren:</div>
+                    <div><strong>AutoGarage Piet:</strong> piet@autogaragepiet.nl / password123</div>
+                    <div><strong>De Snelle Garage:</strong> mark@desnellegarage.nl / password123</div>
+                    <div><strong>Premium Motors:</strong> lisa@premiummotors.nl / password123</div>
+                    <div><strong>Buurgarage Jan:</strong> jan@buurgaragejan.nl / password123</div>
+                    
+                    <div class="mt-3 pt-2 border-t border-blue-300">
+                        <div class="font-semibold text-blue-800 mb-2">Medewerkers:</div>
+                        <div><strong>AutoGarage Piet:</strong> marco.van.der.berg@piet.nl / password123</div>
+                        <div><strong>AutoGarage Piet:</strong> dennis.janssen@piet.nl / password123</div>
+                        <div><strong>De Snelle Garage:</strong> sven.jansen@snelle.nl / password123</div>
+                    </div>
                 </div>
             </div>
         @endif
