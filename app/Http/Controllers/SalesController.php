@@ -181,4 +181,35 @@ class SalesController extends Controller
 
         return redirect()->route('sales.index')->with('success','Verkoop geannuleerd. Auto is teruggezet naar "Verkoop klaar".');
     }
+
+    public function processPayment(Request $request, Sale $sale)
+    {
+        $request->validate([
+            'payment_amount' => 'required|numeric|min:0.01',
+        ]);
+
+        $paymentAmount = $request->input('payment_amount');
+        $currentPaid = $sale->deposit_amount ?? 0;
+        $totalPrice = $sale->sale_price;
+        $remainingBalance = $totalPrice - $currentPaid;
+
+        // Check if payment amount is valid
+        if ($paymentAmount > $remainingBalance) {
+            return back()->with('error', 'Betaalbedrag kan niet hoger zijn dan het restbedrag van €' . number_format($remainingBalance, 2));
+        }
+
+        // Update the deposit amount (we use this field to track total paid amount)
+        $newTotalPaid = $currentPaid + $paymentAmount;
+        
+        $sale->update([
+            'deposit_amount' => $newTotalPaid,
+            'payment_status' => $newTotalPaid >= $totalPrice ? 'paid' : 'deposit_paid'
+        ]);
+
+        $message = $newTotalPaid >= $totalPrice 
+            ? 'Betaling succesvol verwerkt! De verkoop is nu volledig betaald.'
+            : 'Betaling van €' . number_format($paymentAmount, 2) . ' succesvol verwerkt. Restbedrag: €' . number_format($totalPrice - $newTotalPaid, 2);
+
+        return back()->with('success', $message);
+    }
 }

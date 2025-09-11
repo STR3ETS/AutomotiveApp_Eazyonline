@@ -80,11 +80,11 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::get('/actieve-verkoop', [ActiveSalesController::class, 'index'])->name('active-sales.index');
     
     // Sales management - Only owners
-    Route::middleware('can:view.reports')->group(function () {
         Route::resource('sales', SalesController::class);
         Route::post('/sales/{sale}/deliver', [SalesController::class, 'markAsDelivered'])->name('sales.deliver');
         Route::post('/sales/{sale}/cancel', [SalesController::class, 'cancel'])->name('sales.cancel');
-    });
+        Route::post('/sales/{sale}/payment', [SalesController::class, 'processPayment'])->name('sales.payment');
+    
 
     // Employees - Position-based access
     Route::get('/employees', [EmployeeController::class, 'index'])->middleware('can:manage.company')->name('employees.index');

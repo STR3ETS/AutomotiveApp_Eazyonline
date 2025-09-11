@@ -231,6 +231,42 @@
                             </div>
                         @endif
 
+                        <!-- Payment Form - only show if there's a remaining balance -->
+                        @if($sale->payment_status !== 'paid' && ($sale->sale_price - ($sale->deposit_amount ?? 0)) > 0)
+                            <div class="mt-4 pt-4 border-t">
+                                <form method="POST" action="{{ route('sales.payment', $sale) }}">
+                                    @csrf
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Betaling verwerken</label>
+                                    <div class="flex gap-2 mb-3">
+                                        <div class="flex-1">
+                                            <input type="number" 
+                                                   name="payment_amount" 
+                                                   step="0.01" 
+                                                   min="0.01"
+                                                   max="{{ $sale->sale_price - ($sale->deposit_amount ?? 0) }}"
+                                                   placeholder="Bedrag (€)"
+                                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                                   required>
+                                        </div>
+                                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg transition duration-200">
+                                            <i class="fa-solid fa-credit-card"></i>
+                                        </button>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mb-2">Max: €{{ number_format($sale->sale_price - ($sale->deposit_amount ?? 0), 2) }}</p>
+                                </form>
+                                
+                                <!-- Quick pay full amount button -->
+                                <form method="POST" action="{{ route('sales.payment', $sale) }}" class="mt-2">
+                                    @csrf
+                                    <input type="hidden" name="payment_amount" value="{{ $sale->sale_price - ($sale->deposit_amount ?? 0) }}">
+                                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200 text-sm">
+                                        <i class="fa-solid fa-bolt mr-1"></i>
+                                        Betaal volledig restbedrag (€{{ number_format($sale->sale_price - ($sale->deposit_amount ?? 0), 2) }})
+                                    </button>
+                                </form>
+                            </div>
+                        @endif
+
                         <!-- Payment Status Update -->
                         @if($sale->status !== 'delivered' && $sale->status !== 'cancelled')
                             <form method="POST" action="{{ route('sales.update', $sale) }}" class="mt-4 pt-4 border-t">

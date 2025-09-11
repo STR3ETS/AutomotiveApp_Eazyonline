@@ -129,6 +129,7 @@
                                     </div>
                                     <div class="text-xs text-gray-500">Fases doorlopen</div>
                                 </div>
+                                <div><button onclick="window.print()"> Print</button></div>
                             </div>
                         </div>
                     </div>
