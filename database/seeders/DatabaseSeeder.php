@@ -26,6 +26,9 @@ class DatabaseSeeder extends Seeder
         // Seed employees for all companies
         $this->call(EmployeeSeeder::class);
         
+        // Seed listing templates for all companies
+        $this->call(ListingTemplateSeeder::class);
+        
         // Seed car images (must run after CompanySeeder as it creates cars)
         $this->call(CarImageSeeder::class);
         
