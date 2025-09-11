@@ -381,7 +381,7 @@
                                 <div class="w-2 h-2 bg-green-500 rounded-full"></div>
                                 <div>
                                     <p class="text-sm font-medium text-gray-900">Verkocht</p>
-                                    <p class="text-xs text-gray-500">{{ $auto->sales->where('status', 'delivered')->first()->sold_at->format('d-m-Y H:i') }}</p>
+                                    <p class="text-xs text-gray-500">{{ $auto->sales->where('status', 'delivered')->first()->sold_at }}</p>
                                 </div>
                             </div>
                         @endif
@@ -393,7 +393,7 @@
 </div>
 
 <!-- Upload Modal -->
-<div id="uploadModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden" style="display: flex; align-items: center; justify-content: center;">
+<div id="uploadModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden" style="display: none; align-items: center; justify-content: center;">
     <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-semibold text-gray-900">Foto's Uploaden</h3>

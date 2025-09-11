@@ -408,7 +408,8 @@ function quickPublish(platform) {
     
     const formData = new FormData();
     formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
-    formData.append('template_id', 1); // Default template
+    const templateSelect = document.getElementById('templateSelect');
+formData.append('template_id', templateSelect ? templateSelect.value : 1);
     formData.append('platform', platform);
     selectedImages.forEach(id => formData.append('image_ids[]', id));
     
@@ -728,7 +729,8 @@ document.getElementById('advancedForm').addEventListener('submit', function(e) {
     
     const formData = new FormData(this);
     selectedImages.forEach(id => formData.append('image_ids[]', id));
-    formData.append('template_id', 1); // Default template
+const templateSelect = document.getElementById('templateSelect');
+formData.append('template_id', templateSelect.value);
     
     publishListing(formData);
 });
