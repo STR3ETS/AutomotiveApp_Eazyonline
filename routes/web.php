@@ -25,7 +25,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
 
 // Redirect root to login
-Route::get('/', function() {
+Route::get('/', function () {
     if (Auth::check()) {
         return redirect()->route('dashboard');
     }
@@ -39,10 +39,10 @@ Route::get('/css/company/{subdomain}.css', [ThemeController::class, 'generateCSS
 Route::middleware(['auth', 'tenant'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
+
     // Auto management
     Route::resource('autos', AutoController::class);
-    
+
     // Pipeline
     Route::get('/pipeline', [PipelineController::class, 'index'])->name('pipeline.index');
     Route::post('/pipeline/move', [PipelineController::class, 'move'])->name('pipeline.move');
@@ -71,21 +71,22 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::delete('/parts/{part}', [RepairController::class, 'destroyPart'])->name('parts.destroy');
 
     // Customers - Only owners
-    Route::middleware('can:manage.company')->group(function () {
+    
         Route::resource('customers', CustomerController::class);
-    });
+    
 
     // Sales routes - Reports only for owners, but medewerkers can see basic sales status
     Route::get('/verkoop-klaar', [SalesReadyController::class, 'index'])->name('sales-ready.index');
     Route::get('/verkoop-klaar/{car}/pdf', [SalesReadyController::class, 'exportPdf'])->name('sales-ready.pdf');
+    Route::post('/verkoop-klaar/{car}/email', [SalesReadyController::class, 'sendEmailReport'])->name('sales-ready.email');
     Route::get('/actieve-verkoop', [ActiveSalesController::class, 'index'])->name('active-sales.index');
-    
+
     // Sales management - Only owners
-        Route::resource('sales', SalesController::class);
-        Route::post('/sales/{sale}/deliver', [SalesController::class, 'markAsDelivered'])->name('sales.deliver');
-        Route::post('/sales/{sale}/cancel', [SalesController::class, 'cancel'])->name('sales.cancel');
-        Route::post('/sales/{sale}/payment', [SalesController::class, 'processPayment'])->name('sales.payment');
-    
+    Route::resource('sales', SalesController::class);
+    Route::post('/sales/{sale}/deliver', [SalesController::class, 'markAsDelivered'])->name('sales.deliver');
+    Route::post('/sales/{sale}/cancel', [SalesController::class, 'cancel'])->name('sales.cancel');
+    Route::post('/sales/{sale}/payment', [SalesController::class, 'processPayment'])->name('sales.payment');
+
 
     // Employees - Position-based access
     Route::get('/employees', [EmployeeController::class, 'index'])->middleware('can:manage.company')->name('employees.index');
@@ -140,10 +141,10 @@ Route::middleware(['auth.simple', App\Http\Middleware\TenantContext::class])->gr
     // Listing publishing API
     Route::post('/tenants/{tenant}/listings/{id}/publish', [App\Http\Controllers\ListingPublishController::class, 'publishListing'])
         ->name('api.listings.publish');
-    
+
     Route::get('/tenants/{tenant}/listings/{id}/status', [App\Http\Controllers\ListingPublishController::class, 'getListingStatus'])
         ->name('api.listings.status');
-    
+
     // Analytics API
     Route::get('/tenants/{tenant}/analytics/active-users', [App\Http\Controllers\ListingPublishController::class, 'getActiveUsers'])
         ->name('api.analytics.active-users');

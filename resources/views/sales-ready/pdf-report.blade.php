@@ -175,7 +175,7 @@
 
     <!-- Auto Informatie -->
     <div class="car-info">
-        <h2>🚗 Voertuig Informatie</h2>
+        <h2>Voertuig Informatie</h2>
         <div class="info-grid">
             <div class="info-row">
                 <div class="info-label">Kenteken:</div>
@@ -206,7 +206,7 @@
 
     <!-- Uitgevoerde Werkzaamheden -->
     <div class="tasks-section">
-        <h2 style="color: #007bff; margin-bottom: 20px;">✅ Uitgevoerde Werkzaamheden</h2>
+        <h2 style="color: #007bff; margin-bottom: 20px;">Uitgevoerde Werkzaamheden</h2>
         
         @if($car->completed_tasks_by_stage->count() === 0)
             <p style="text-align: center; color: #666; font-style: italic; padding: 20px;">
@@ -242,7 +242,7 @@
 
     <!-- Statistieken -->
     <div class="stats-section">
-        <h3 style="margin: 0 0 15px 0; color: #007bff;">📊 Overzicht</h3>
+        <h3 style="margin: 0 0 15px 0; color: #007bff;">Overzicht</h3>
         <div class="stats-grid">
             <div class="stat-item">
                 <div class="stat-number">{{ $car->checklists->count() }}</div>
@@ -261,7 +261,7 @@
 
     <!-- Footer -->
     <div class="footer">
-        {{ $car->company->name ?? 'Automotive App' }} • Werkzaamheden Rapport • {{ $car->license_plate }} • Pagina 1
+        {{ $car->company->name ?? 'Automotive App' }} • Werkzaamheden Rapport • {{ $car->license_plate }}
     </div>
 </body>
 </html>

@@ -129,13 +129,23 @@
                                     </div>
                                     <div class="text-xs text-gray-500">Fases doorlopen</div>
                                 </div>
-                                <div class="flex items-center justify-center">
+                                <div class="flex items-center justify-center gap-2">
                                     <a href="{{ route('sales-ready.pdf', $car) }}" 
                                        target="_blank"
                                        class="inline-flex items-center px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition duration-200 shadow-sm">
                                         <i class="fas fa-file-pdf mr-2"></i>
                                         PDF
                                     </a>
+                                    
+                                    <form method="POST" action="{{ route('sales-ready.email', $car) }}" class="inline">
+                                        @csrf
+                                        <button type="submit" 
+                                                class="inline-flex items-center px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition duration-200 shadow-sm"
+                                                onclick="return confirm('Weet je zeker dat je het rapport wilt e-mailen?')">
+                                            <i class="fas fa-envelope mr-2"></i>
+                                            E-mail
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>

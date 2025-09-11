@@ -7,6 +7,9 @@ use App\Models\Sale;
 use App\Models\Repair;
 use App\Models\Appointment;
 use App\Models\CarStageTransition;
+use App\Models\Employee;
+use App\Models\Customer;
+use App\Models\Company;
 use App\Traits\BelongsToCompany;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -116,6 +119,39 @@ class Car extends Model
     public function listings()
     {
         return $this->hasMany(CarListing::class);
+    }
+
+    // Eigenaar van het bedrijf waar deze auto bij hoort
+    public function owner()
+    {
+        return $this->belongsTo(Employee::class, 'company_id', 'company_id')
+                    ->where('position', 'eigenaar');
+    }
+
+    // Alle medewerkers van het bedrijf waar deze auto bij hoort
+    public function employees()
+    {
+        return $this->hasMany(Employee::class, 'company_id', 'company_id');
+    }
+
+    // Eerste medewerker van het bedrijf (verkoper)
+    public function seller()
+    {
+        return $this->belongsTo(Employee::class, 'company_id', 'company_id')
+                    ->where('position', 'medewerker');
+    }
+
+    // Klant via de laatste sale
+    public function customer()
+    {
+        return $this->hasOneThrough(
+            Customer::class,
+            Sale::class,
+            'car_id', // Foreign key on sales table
+            'id', // Foreign key on customers table  
+            'id', // Local key on cars table
+            'customer_id' // Local key on sales table
+        )->latest('sales.created_at');
     }
 
     public function activeListings()
