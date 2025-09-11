@@ -129,7 +129,14 @@
                                     </div>
                                     <div class="text-xs text-gray-500">Fases doorlopen</div>
                                 </div>
-                                <div><button onclick="window.print()"> Print</button></div>
+                                <div class="flex items-center justify-center">
+                                    <a href="{{ route('sales-ready.pdf', $car) }}" 
+                                       target="_blank"
+                                       class="inline-flex items-center px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition duration-200 shadow-sm">
+                                        <i class="fas fa-file-pdf mr-2"></i>
+                                        PDF
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>

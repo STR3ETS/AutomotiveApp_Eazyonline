@@ -77,6 +77,7 @@ Route::middleware(['auth', 'tenant'])->group(function () {
 
     // Sales routes - Reports only for owners, but medewerkers can see basic sales status
     Route::get('/verkoop-klaar', [SalesReadyController::class, 'index'])->name('sales-ready.index');
+    Route::get('/verkoop-klaar/{car}/pdf', [SalesReadyController::class, 'exportPdf'])->name('sales-ready.pdf');
     Route::get('/actieve-verkoop', [ActiveSalesController::class, 'index'])->name('active-sales.index');
     
     // Sales management - Only owners
