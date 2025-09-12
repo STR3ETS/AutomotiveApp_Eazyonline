@@ -136,8 +136,11 @@
                                         <i class="fas fa-file-pdf mr-2"></i>
                                         PDF
                                     </a>
-                                    
-                                    <form method="POST" action="{{ route('sales-ready.email', $car) }}" class="inline">
+                                
+                                </div>
+                                <div></div>
+                                <div>
+                                                                        <form method="POST" action="{{ route('sales-ready.email', $car) }}" class="inline">
                                         @csrf
                                         <button type="submit" 
                                                 class="inline-flex items-center px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition duration-200 shadow-sm"

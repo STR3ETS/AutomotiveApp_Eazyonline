@@ -147,9 +147,9 @@
                     </h2>
                 </div>
                 <div class="p-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {{-- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"> --}}
                         <!-- Uurtarief -->
-                        <div>
+                        {{-- <div>
                             <label for="repair_hourly_rate" class="block text-sm font-medium text-[var(--text-primary)] mb-2">
                                 Uurtarief Reparaties (€)
                             </label>
@@ -157,10 +157,10 @@
                                    value="{{ old('repair_hourly_rate', $company->getRepairHourlyRate()) }}"
                                    step="0.01" min="0" max="500"
                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
+                        </div> --}}
 
                         <!-- Max afspraken per dag -->
-                        <div>
+                        {{-- <div>
                             <label for="max_appointments_per_day" class="block text-sm font-medium text-[var(--text-primary)] mb-2">
                                 Max. afspraken per dag
                             </label>
@@ -168,10 +168,10 @@
                                    value="{{ old('max_appointments_per_day', $company->getMaxAppointmentsPerDay()) }}"
                                    min="1" max="50"
                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
+                        </div> --}}
 
                         <!-- Standaard afspraak duur -->
-                        <div>
+                        {{-- <div>
                             <label for="default_appointment_duration" class="block text-sm font-medium text-[var(--text-primary)] mb-2">
                                 Standaard afspraak duur (min)
                             </label>
@@ -184,8 +184,8 @@
                                     </option>
                                 @endforeach
                             </select>
-                        </div>
-                    </div>
+                        </div> --}}
+                    {{-- </div> --}}
 
                     <!-- Openingstijden -->
                     <div class="mt-6">
@@ -224,7 +224,7 @@
             </div>
 
             <!-- Pipeline & Automatisering -->
-            <div class="bg-[var(--background-card)] rounded-xl shadow-sm border border-[var(--border-light)] overflow-hidden">
+            {{-- <div class="bg-[var(--background-card)] rounded-xl shadow-sm border border-[var(--border-light)] overflow-hidden">
                 <div class="px-6 py-4 bg-gradient-to-r from-purple-50 to-indigo-50 border-b border-[var(--border-light)]">
                     <h2 class="text-xl font-semibold text-[var(--text-primary)] flex items-center">
                         <i class="fa-solid fa-robot text-purple-600 mr-3"></i>
@@ -295,10 +295,10 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Financiële Instellingen -->
-            <div class="bg-[var(--background-card)] rounded-xl shadow-sm border border-[var(--border-light)] overflow-hidden">
+            {{-- <div class="bg-[var(--background-card)] rounded-xl shadow-sm border border-[var(--border-light)] overflow-hidden">
                 <div class="px-6 py-4 bg-gradient-to-r from-yellow-50 to-amber-50 border-b border-[var(--border-light)]">
                     <h2 class="text-xl font-semibold text-[var(--text-primary)] flex items-center">
                         <i class="fa-solid fa-euro-sign text-yellow-600 mr-3"></i>
@@ -358,7 +358,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Branding & Uiterlijk -->
             <div class="bg-[var(--background-card)] rounded-xl shadow-sm border border-[var(--border-light)] overflow-hidden">
