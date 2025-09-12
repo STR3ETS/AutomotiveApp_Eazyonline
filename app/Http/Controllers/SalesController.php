@@ -145,7 +145,19 @@ class SalesController extends Controller
             'notes' => 'nullable|string',
         ]);
 
+        // Check if payment_status is being changed to 'paid' and if the sale will be fully paid
+        $isChangingToPaid = ($sale->payment_status !== 'paid' && $data['payment_status'] === 'paid');
+        $depositAmount = $data['deposit_amount'] ?? $sale->deposit_amount ?? 0;
+        $willBeFullyPaid = $isChangingToPaid && $depositAmount >= $data['sale_price'];
+
         $sale->update($data);
+
+        if ($willBeFullyPaid) {
+            // Sale is now fully paid - the observer will move it to sold_cars
+            // Redirect to sales index because the current sale will be deleted
+            return redirect()->route('sales.index')->with('success',
+                'Verkoopdossier succesvol bijgewerkt! De auto is verplaatst naar verkochte auto\'s omdat de betaling volledig is.');
+        }
 
         return redirect()->route('sales.show', $sale)->with('success','Verkoopdossier succesvol bijgewerkt.');
     }
@@ -201,15 +213,23 @@ class SalesController extends Controller
         // Update the deposit amount (we use this field to track total paid amount)
         $newTotalPaid = $currentPaid + $paymentAmount;
         
+        // Check if this payment will complete the sale
+        $willCompletePayment = $newTotalPaid >= $totalPrice;
+        
         $sale->update([
             'deposit_amount' => $newTotalPaid,
-            'payment_status' => $newTotalPaid >= $totalPrice ? 'paid' : 'deposit_paid'
+            'payment_status' => $willCompletePayment ? 'paid' : 'deposit_paid'
         ]);
 
-        $message = $newTotalPaid >= $totalPrice 
-            ? 'Betaling succesvol verwerkt! De verkoop is nu volledig betaald.'
-            : 'Betaling van €' . number_format($paymentAmount, 2) . ' succesvol verwerkt. Restbedrag: €' . number_format($totalPrice - $newTotalPaid, 2);
-
-        return back()->with('success', $message);
+        if ($willCompletePayment) {
+            // Sale is now fully paid - the observer will move it to sold_cars
+            // Redirect to sales index because the current sale will be deleted
+            return redirect()->route('sales.index')->with('success', 
+                'Betaling succesvol verwerkt! De verkoop is nu volledig betaald en de auto is verplaatst naar verkochte auto\'s.');
+        } else {
+            // Payment processed but not complete - safe to go back
+            $message = 'Betaling van €' . number_format($paymentAmount, 2) . ' succesvol verwerkt. Restbedrag: €' . number_format($totalPrice - $newTotalPaid, 2);
+            return back()->with('success', $message);
+        }
     }
 }

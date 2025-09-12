@@ -11,6 +11,7 @@ use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SalesReadyController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ActiveSalesController;
+use App\Http\Controllers\SoldCarsController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\TenantTestController;
 use App\Http\Controllers\AuthController;
@@ -86,6 +87,10 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::post('/sales/{sale}/deliver', [SalesController::class, 'markAsDelivered'])->name('sales.deliver');
     Route::post('/sales/{sale}/cancel', [SalesController::class, 'cancel'])->name('sales.cancel');
     Route::post('/sales/{sale}/payment', [SalesController::class, 'processPayment'])->name('sales.payment');
+
+    // Sold Cars - Only owners  
+    Route::get('/sold-cars', [SoldCarsController::class, 'index'])->middleware('can:view.reports')->name('sold-cars.index');
+    Route::get('/sold-cars/{soldCar}', [SoldCarsController::class, 'show'])->middleware('can:view.reports')->name('sold-cars.show');
 
 
     // Employees - Position-based access
