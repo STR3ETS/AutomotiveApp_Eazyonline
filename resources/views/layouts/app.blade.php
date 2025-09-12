@@ -33,93 +33,113 @@
 <body class="flex min-h-screen">
 
     <!-- Sidebar -->
-    <div class="px-[1rem] py-[1.5rem] bg-[var(--primary-color)] flex flex-col gap-16">
+    <div class="px-[1rem] py-[1.5rem] flex flex-col gap-16 shadow-lg" style="background-color: var(--primary-color);">
         <div class="flex items-center gap-4 pl-2">
             <div
-                class="w-8 h-8 bg-[var(--primary-light)] rounded-[var(--border-radius)] flex items-center justify-center">
-                <i class="fa-solid fa-car-side fa-sm text-[var(--text-white)]"></i>
+                class="w-8 h-8 rounded-[var(--border-radius)] flex items-center justify-center shadow-md" 
+                style="background-color: var(--secondary-color);">
+                <i class="fa-solid fa-car-side fa-sm" style="color: var(--text-kleur-white);"></i>
             </div>
             <div>
-                <h5 class="text-[var(--text-white)] text-sm font-semibold tracking-tighter">
+                <h5 class="text-sm font-semibold tracking-tighter" style="color: var(--text-kleur-white);">
                     {{ Auth::check() && isset($currentCompany) ? $currentCompany->name : 'Bedrijfsnaam' }}
                 </h5>
-                <h6 class="text-[var(--text-white-dimmed)] text-xs font-medium tracking-tighter">Operations Center</h6>
+                <h6 class="text-xs font-medium tracking-tighter" style="color: var(--third-color);">Operations Center</h6>
             </div>
         </div>
 
         <!-- Navigatie -->
         <div>
-            <h4 class="text-[var(--text-white-muted)] text-xs font-semibold tracking-tighter pl-2 mb-2">Navigatie</h4>
+            <h4 class="text-xs font-semibold tracking-tighter pl-2 mb-2" style="color: var(--third-color);">Navigatie</h4>
             <div class="flex flex-col">
 
                 <!-- Altijd zichtbaar -->
                 <a href="/"
-                    class="flex items-center transition duration-200 rounded-[var(--border-radius)] hover:bg-[var(--primary-lighter)]">
+                    class="flex items-center transition duration-200 rounded-[var(--border-radius)] hover:shadow-md" 
+                    style="hover:background-color: var(--secondary-color);"
+                    onmouseover="this.style.backgroundColor='var(--secondary-color)'"
+                    onmouseout="this.style.backgroundColor='transparent'">
                     <div class="flex items-center gap-2 w-[200px] p-2">
-                        <i class="fa-solid fa-house fa-sm text-[var(--text-white)]"></i>
-                        <p class="text-sm text-[var(--text-white)] font-semibold tracking-tighter">Overzicht</p>
+                        <i class="fa-solid fa-house fa-sm" style="color: var(--text-kleur-white);"></i>
+                        <p class="text-sm font-semibold tracking-tighter" style="color: var(--text-kleur-white);">Overzicht</p>
                     </div>
                 </a>
                 <a href="/agenda"
-                    class="flex items-center transition duration-200 rounded-[var(--border-radius)] hover:bg-[var(--primary-lighter)]">
+                    class="flex items-center transition duration-200 rounded-[var(--border-radius)] hover:shadow-md"
+                    onmouseover="this.style.backgroundColor='var(--secondary-color)'"
+                    onmouseout="this.style.backgroundColor='transparent'">
                     <div class="flex items-center gap-2 w-[200px] p-2">
-                        <i class="fa-solid fa-calendar-days fa-sm text-[var(--text-white)]"></i>
-                        <p class="text-sm text-[var(--text-white)] font-semibold tracking-tighter">Agenda</p>
+                        <i class="fa-solid fa-calendar-days fa-sm" style="color: var(--text-kleur-white);"></i>
+                        <p class="text-sm font-semibold tracking-tighter" style="color: var(--text-kleur-white);">Agenda</p>
                     </div>
                 </a>
                 <a href="/pipeline"
-                    class="flex items-center transition duration-200 rounded-[var(--border-radius)] hover:bg-[var(--primary-lighter)]">
+                    class="flex items-center transition duration-200 rounded-[var(--border-radius)] hover:shadow-md"
+                    onmouseover="this.style.backgroundColor='var(--secondary-color)'"
+                    onmouseout="this.style.backgroundColor='transparent'">
                     <div class="flex items-center gap-2 w-[200px] p-2">
-                        <i class="fa-solid fa-box fa-sm text-[var(--text-white)]"></i>
-                        <p class="text-sm text-[var(--text-white)] font-semibold tracking-tighter">Voorraad Pipeline</p>
+                        <i class="fa-solid fa-box fa-sm" style="color: var(--text-kleur-white);"></i>
+                        <p class="text-sm font-semibold tracking-tighter" style="color: var(--text-kleur-white);">Voorraad Pipeline</p>
                     </div>
                 </a>
                 <a href="/repairs"
-                    class="flex items-center transition duration-200 rounded-[var(--border-radius)] hover:bg-[var(--primary-lighter)]">
+                    class="flex items-center transition duration-200 rounded-[var(--border-radius)] hover:shadow-md"
+                    onmouseover="this.style.backgroundColor='var(--secondary-color)'"
+                    onmouseout="this.style.backgroundColor='transparent'">
                     <div class="flex items-center gap-2 w-[200px] p-2">
-                        <i class="fa-solid fa-wrench fa-sm text-[var(--text-white)]"></i>
-                        <p class="text-sm text-[var(--text-white)] font-semibold tracking-tighter">Reparaties</p>
+                        <i class="fa-solid fa-wrench fa-sm" style="color: var(--text-kleur-white);"></i>
+                        <p class="text-sm font-semibold tracking-tighter" style="color: var(--text-kleur-white);">Reparaties</p>
                     </div>
                 </a>
 
                 <!-- Alleen medewerkers -->
                 @if(Auth::check() && Auth::user()->employee?->position === 'medewerker')
                 <a href="{{ route('employees.show', Auth::user()->employee) }}"
-                    class="flex items-center transition duration-200 rounded-[var(--border-radius)] hover:bg-[var(--primary-lighter)]">
+                    class="flex items-center transition duration-200 rounded-[var(--border-radius)] hover:shadow-md"
+                    onmouseover="this.style.backgroundColor='var(--secondary-color)'"
+                    onmouseout="this.style.backgroundColor='transparent'">
                     <div class="flex items-center gap-2 w-[200px] p-2">
-                        <i class="fa-solid fa-user fa-sm text-[var(--text-white)]"></i>
-                        <p class="text-sm text-[var(--text-white)] font-semibold tracking-tighter">Mijn Werk</p>
+                        <i class="fa-solid fa-user fa-sm" style="color: var(--text-kleur-white);"></i>
+                        <p class="text-sm font-semibold tracking-tighter" style="color: var(--text-kleur-white);">Mijn Werk</p>
                     </div>
                 </a>
                 @endif
 
                 <!-- Voor iedereen -->
                 <a href="{{ route('autos.index') }}"
-                    class="flex items-center transition duration-200 rounded-[var(--border-radius)] hover:bg-[var(--primary-lighter)]">
+                    class="flex items-center transition duration-200 rounded-[var(--border-radius)] hover:shadow-md"
+                    onmouseover="this.style.backgroundColor='var(--secondary-color)'"
+                    onmouseout="this.style.backgroundColor='transparent'">
                     <div class="flex items-center gap-2 w-[200px] p-2">
-                        <i class="fa-solid fa-car fa-sm text-[var(--text-white)]"></i>
-                        <p class="text-sm text-[var(--text-white)] font-semibold tracking-tighter">Auto Beheer</p>
+                        <i class="fa-solid fa-car fa-sm" style="color: var(--text-kleur-white);"></i>
+                        <p class="text-sm font-semibold tracking-tighter" style="color: var(--text-kleur-white);">Auto Beheer</p>
                     </div>
                 </a>
                 <a href="{{ route('sales-ready.index') }}"
-                    class="flex items-center transition duration-200 rounded-[var(--border-radius)] hover:bg-[var(--primary-lighter)]">
+                    class="flex items-center transition duration-200 rounded-[var(--border-radius)] hover:shadow-md"
+                    onmouseover="this.style.backgroundColor='var(--secondary-color)'"
+                    onmouseout="this.style.backgroundColor='transparent'">
                     <div class="flex items-center gap-2 w-[200px] p-2">
-                        <i class="fa-solid fa-check fa-sm text-[var(--text-white)]"></i>
-                        <p class="text-sm text-[var(--text-white)] font-semibold tracking-tighter">Verkoop Klaar</p>
+                        <i class="fa-solid fa-check fa-sm" style="color: var(--text-kleur-white);"></i>
+                        <p class="text-sm font-semibold tracking-tighter" style="color: var(--text-kleur-white);">Verkoop Klaar</p>
                     </div>
                 </a>
                 <a href="{{ route('customers.index') }}"
-                    class="flex items-center transition duration-200 rounded-[var(--border-radius)] hover:bg-[var(--primary-lighter)]">
+                    class="flex items-center transition duration-200 rounded-[var(--border-radius)] hover:shadow-md"
+                    onmouseover="this.style.backgroundColor='var(--secondary-color)'"
+                    onmouseout="this.style.backgroundColor='transparent'">
                     <div class="flex items-center gap-2 w-[200px] p-2">
-                        <i class="fa-solid fa-users fa-sm text-[var(--text-white)]"></i>
-                        <p class="text-sm text-[var(--text-white)] font-semibold tracking-tighter">Klanten</p>
+                        <i class="fa-solid fa-users fa-sm" style="color: var(--text-kleur-white);"></i>
+                        <p class="text-sm font-semibold tracking-tighter" style="color: var(--text-kleur-white);">Klanten</p>
                     </div>
                 </a>
                 <a href="{{ route('active-sales.index') }}"
-                    class="flex items-center transition duration-200 rounded-[var(--border-radius)] hover:bg-[var(--primary-lighter)]">
+                    class="flex items-center transition duration-200 rounded-[var(--border-radius)] hover:shadow-md"
+                    onmouseover="this.style.backgroundColor='var(--secondary-color)'"
+                    onmouseout="this.style.backgroundColor='transparent'">
                     <div class="flex items-center gap-2 w-[200px] p-2">
-                        <i class="fa-solid fa-handshake fa-sm text-[var(--text-white)]"></i>
-                        <p class="text-sm text-[var(--text-white)] font-semibold tracking-tighter">Klaar voor Oplevering
+                        <i class="fa-solid fa-handshake fa-sm" style="color: var(--text-kleur-white);"></i>
+                        <p class="text-sm font-semibold tracking-tighter" style="color: var(--text-kleur-white);">Klaar voor Oplevering
                         </p>
                     </div>
                 </a>
@@ -127,24 +147,30 @@
                 <!-- Alleen owners -->
                 @if(!Auth::check() || Auth::user()->employee?->position !== 'medewerker')
                 <a href="{{ route('employees.index') }}"
-                    class="flex items-center transition duration-200 rounded-[var(--border-radius)] hover:bg-[var(--primary-lighter)]">
+                    class="flex items-center transition duration-200 rounded-[var(--border-radius)] hover:shadow-md"
+                    onmouseover="this.style.backgroundColor='var(--secondary-color)'"
+                    onmouseout="this.style.backgroundColor='transparent'">
                     <div class="flex items-center gap-2 w-[200px] p-2">
-                        <i class="fa-solid fa-user-hard-hat fa-sm text-[var(--text-white)]"></i>
-                        <p class="text-sm text-[var(--text-white)] font-semibold tracking-tighter">Medewerkers</p>
+                        <i class="fa-solid fa-user-hard-hat fa-sm" style="color: var(--text-kleur-white);"></i>
+                        <p class="text-sm font-semibold tracking-tighter" style="color: var(--text-kleur-white);">Medewerkers</p>
                     </div>
                 </a>
                 <a href="{{ route('reports.index') }}"
-                    class="flex items-center transition duration-200 rounded-[var(--border-radius)] hover:bg-[var(--primary-lighter)]">
+                    class="flex items-center transition duration-200 rounded-[var(--border-radius)] hover:shadow-md"
+                    onmouseover="this.style.backgroundColor='var(--secondary-color)'"
+                    onmouseout="this.style.backgroundColor='transparent'">
                     <div class="flex items-center gap-2 w-[200px] p-2">
-                        <i class="fa-solid fa-clipboard fa-sm text-[var(--text-white)]"></i>
-                        <p class="text-sm text-[var(--text-white)] font-semibold tracking-tighter">Rapportage</p>
+                        <i class="fa-solid fa-clipboard fa-sm" style="color: var(--text-kleur-white);"></i>
+                        <p class="text-sm font-semibold tracking-tighter" style="color: var(--text-kleur-white);">Rapportage</p>
                     </div>
                 </a>
                 <a href="{{ route('company-settings.index') }}"
-                    class="flex items-center transition duration-200 rounded-[var(--border-radius)] hover:bg-[var(--primary-lighter)]">
+                    class="flex items-center transition duration-200 rounded-[var(--border-radius)] hover:shadow-md"
+                    onmouseover="this.style.backgroundColor='var(--secondary-color)'"
+                    onmouseout="this.style.backgroundColor='transparent'">
                     <div class="flex items-center gap-2 w-[200px] p-2">
-                        <i class="fa-solid fa-gear fa-sm text-[var(--text-white)]"></i>
-                        <p class="text-sm text-[var(--text-white)] font-semibold tracking-tighter">Bedrijfsinstellingen
+                        <i class="fa-solid fa-gear fa-sm" style="color: var(--text-kleur-white);"></i>
+                        <p class="text-sm font-semibold tracking-tighter" style="color: var(--text-kleur-white);">Bedrijfsinstellingen
                         </p>
                     </div>
                 </a>
@@ -156,21 +182,21 @@
 
     <!-- Content -->
     <div class="flex-1 h-full flex flex-col">
-        <div class="p-[1rem] border-b border-[#e2e2e2] flex justify-between items-center">
+        <div class="p-[1rem] flex justify-between items-center shadow-sm" style="border-bottom: 1px solid var(--third-color);">
             <div>
-                <h3 class="text-[var(--text-color)] font-bold tracking-tighter text-lg leading-tight">
+                <h3 class="font-bold tracking-tighter text-lg leading-tight" style="color: var(--text-kleur-black);">
                     Goeiedag {{ Auth::user()?->name }}
                 </h3>
-                <h4 class="text-[var(--text-color)]/50 font-semibold tracking-tighter text-sm leading-tight">
+                <h4 class="font-semibold tracking-tighter text-sm leading-tight" style="color: var(--secondary-color);">
                     {{ now()->format('l j F Y') }}
                 </h4>
             </div>
             @if(Auth::check())
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+            <div class="rounded-lg p-3 mb-4 shadow-sm" style="background-color: var(--third-color); border: 1px solid var(--secondary-color);">
                 <div class="flex items-center gap-2 text-sm">
-                    <i class="fa-solid fa-user text-blue-600"></i>
-                    <span class="font-medium text-blue-900">{{ Auth::user()->name }}</span>
-                    <span class="px-2 py-1 bg-blue-200 text-blue-800 rounded text-xs font-medium">
+                    <i class="fa-solid fa-user" style="color: var(--primary-color);"></i>
+                    <span class="font-medium" style="color: var(--text-kleur-black);">{{ Auth::user()->name }}</span>
+                    <span class="px-2 py-1 rounded text-xs font-medium" style="background-color: var(--secondary-color); color: var(--text-kleur-white);">
                         {{ ucfirst(Auth::user()->display_role) }}
                     </span>
                 </div>
@@ -179,7 +205,10 @@
             <form method="POST" action="{{ route('auth.logout') }}">
                 @csrf
                 <button type="submit"
-                    class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors duration-200">
+                    class="px-4 py-2 rounded text-sm font-medium transition-colors duration-200 shadow-sm hover:shadow-md"
+                    style="background-color: var(--primary-color); color: var(--text-kleur-white);"
+                    onmouseover="this.style.backgroundColor='var(--secondary-color)'"
+                    onmouseout="this.style.backgroundColor='var(--primary-color)'">
                     <i class="fa-solid fa-sign-out-alt mr-2"></i>Uitloggen
                 </button>
             </form>

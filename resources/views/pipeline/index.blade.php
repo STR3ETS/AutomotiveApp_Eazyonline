@@ -1,49 +1,52 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="bg-gray-50 min-h-full">
+<div class="min-h-full" style="background-color: var(--third-color);">
     <div class="max-w-full mx-auto px-4 py-8">
         <!-- Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">🏭 Voorraad Pipeline</h1>
-            <p class="text-gray-600">Sleep auto's tussen de verschillende fases om je voorraad te beheren</p>
+        <div class="mb-8 p-6 rounded-xl shadow-sm" style="background: linear-gradient(135deg, var(--primary-color)10, var(--secondary-color)20); border: 1px solid var(--secondary-color);">
+            <h1 class="text-3xl font-bold mb-2" style="color: var(--primary-color);">🏭 Voorraad Pipeline</h1>
+            <p style="color: var(--secondary-color);">Sleep auto's tussen de verschillende fases om je voorraad te beheren</p>
         </div>
         
         <div class="space-y-8" x-data="pipelineDrag()">
             @foreach($stages as $stage)
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover-stage" 
+                <div class="rounded-xl shadow-sm p-6 hover-stage" 
+                     style="background-color: var(--text-kleur-white); border: 1px solid var(--secondary-color);"
                      x-data="{ stageId: {{ $stage->id }} }" 
                      @dragover.prevent 
                      @drop="onDrop($event, stageId)"
-                     :class="{ 'ring-2 ring-blue-300 bg-blue-50': draggedCarId && hoveredStage === stageId }"
+                     :class="{ 'ring-2': draggedCarId && hoveredStage === stageId }"
+                     :style="draggedCarId && hoveredStage === stageId ? 'background-color: var(--third-color);' : ''"
                      @dragenter="hoveredStage = stageId"
                      @dragleave="if ($event.target === $el) hoveredStage = null">
                     
                     <!-- Stage Header -->
-                    <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
+                    <div class="flex items-center justify-between mb-6 pb-4" style="border-bottom: 1px solid var(--third-color);">
                         <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                            <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));">
                                 @if($stage->name === 'Intake')
-                                    <i class="fa-solid fa-clipboard-list text-white text-lg"></i>
+                                    <i class="fa-solid fa-clipboard-list text-lg" style="color: var(--text-kleur-white);"></i>
                                 @elseif($stage->name === 'Technische controle')
-                                    <i class="fa-solid fa-tools text-white text-lg"></i>
+                                    <i class="fa-solid fa-tools text-lg" style="color: var(--text-kleur-white);"></i>
                                 @elseif($stage->name === 'Herstel & Onderhoud')
-                                    <i class="fa-solid fa-wrench text-white text-lg"></i>
+                                    <i class="fa-solid fa-wrench text-lg" style="color: var(--text-kleur-white);"></i>
                                 @elseif($stage->name === 'Commercieel gereed')
-                                    <i class="fa-solid fa-camera text-white text-lg"></i>
+                                    <i class="fa-solid fa-camera text-lg" style="color: var(--text-kleur-white);"></i>
                                 @elseif($stage->name === 'Verkoop klaar')
-                                    <i class="fa-solid fa-handshake text-white text-lg"></i>
+                                    <i class="fa-solid fa-handshake text-lg" style="color: var(--text-kleur-white);"></i>
                                 @else
-                                    <i class="fa-solid fa-car text-white text-lg"></i>
+                                    <i class="fa-solid fa-car text-lg" style="color: var(--text-kleur-white);"></i>
                                 @endif
                             </div>
                             <div>
-                                <h2 class="text-xl font-bold text-gray-900">{{ $stage->name }}</h2>
-                                <p class="text-sm text-gray-600">{{ $stage->description ?? 'Fase in het productieproces' }}</p>
+                                <h2 class="text-xl font-bold" style="color: var(--text-kleur-black);">{{ $stage->name }}</h2>
+                                <p class="text-sm" style="color: var(--secondary-color);">{{ $stage->description ?? 'Fase in het productieproces' }}</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 text-sm font-semibold px-4 py-2 rounded-full shadow-sm">
+                            <span class="text-sm font-semibold px-4 py-2 rounded-full shadow-sm" 
+                                  style="background: linear-gradient(135deg, var(--third-color), var(--secondary-color)20); color: var(--text-kleur-black);">
                                 {{ $stage->cars->count() }} auto{{ $stage->cars->count() !== 1 ? "'s" : '' }}
                             </span>
                         </div>
@@ -57,11 +60,14 @@
                             $completion = $car->stage_completion;
                             $canMove = $car->canMoveToNextStage();
                         @endphp
-                        <div class="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-sm p-4 cursor-move border border-gray-200 hover:shadow-lg hover:border-blue-300 transition-all duration-300 w-72 flex-shrink-0 car-card" 
+                        <div class="rounded-xl shadow-sm p-4 cursor-move transition-all duration-300 w-72 flex-shrink-0 car-card hover:shadow-lg" 
+                             style="background: linear-gradient(135deg, var(--text-kleur-white), var(--third-color)20); border: 1px solid var(--third-color);"
                              draggable="true" 
                              @dragstart="onDragStart($event, {{ $car->id }})"
                              @dragend="onDragEnd()"
-                             :class="{ 'opacity-50 transform rotate-1': draggedCarId === {{ $car->id }} }">
+                             :class="{ 'opacity-50 transform rotate-1': draggedCarId === {{ $car->id }} }"
+                             onmouseover="this.style.borderColor='var(--primary-color)'"
+                             onmouseout="this.style.borderColor='var(--third-color)'">
                             
                             <!-- Car Image -->
                             @if($car->images->where('is_primary', true)->first())
@@ -71,30 +77,31 @@
                                              alt="{{ $car->license_plate }}"
                                              class="w-full h-32 object-cover hover:scale-105 transition-transform duration-200">
                                         <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                                        <div class="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                                        <div class="absolute bottom-2 right-2 text-xs px-2 py-1 rounded" 
+                                             style="background-color: var(--primary-color); color: var(--text-kleur-white);">
                                             Bekijk details
                                         </div>
                                     </a>
                                 </div>
                             @else
-                                <div class="mb-3 bg-gray-100 rounded-lg h-32 flex items-center justify-center">
+                                <div class="mb-3 rounded-lg h-32 flex items-center justify-center" style="background-color: var(--third-color);">
                                     <a href="{{ route('autos.show', $car) }}" @click.stop class="text-center">
-                                        <i class="fa-solid fa-image text-gray-400 text-2xl mb-2 block"></i>
-                                        <span class="text-xs text-gray-500">Geen foto</span>
+                                        <i class="fa-solid fa-image text-2xl mb-2 block" style="color: var(--secondary-color);"></i>
+                                        <span class="text-xs" style="color: var(--secondary-color);">Geen foto</span>
                                     </a>
                                 </div>
                             @endif
                             
                             <!-- Car Header -->
                             <div class="flex items-center gap-3 mb-3">
-                                <div class="w-10 h-10 bg-gradient-to-r from-blue-100 to-blue-200 rounded-full flex items-center justify-center">
-                                    <i class="fa-solid fa-car text-blue-600"></i>
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--third-color), var(--secondary-color)20);">
+                                    <i class="fa-solid fa-car" style="color: var(--primary-color);"></i>
                                 </div>
                                 <div class="flex-1">
-                                    <div class="font-bold text-gray-900 text-sm truncate">
+                                    <div class="font-bold text-sm truncate" style="color: var(--text-kleur-black);">
                                         {{ $car->license_plate }}
                                     </div>
-                                    <div class="text-xs text-gray-600">
+                                    <div class="text-xs" style="color: var(--secondary-color);">
                                         {{ $car->brand }} {{ $car->model }}
                                     </div>
                                 </div>
@@ -102,16 +109,16 @@
                             
                             <!-- Price -->
                             <div class="mb-3">
-                                <div class="text-lg font-bold text-green-600">
+                                <div class="text-lg font-bold" style="color: var(--primary-color);">
                                     €{{ number_format($car->price, 0, ',', '.') }}
                                 </div>
                             </div>
                             
                             <!-- Progress Section -->
                             <div class="mb-4">
-                                <div class="flex justify-between text-xs font-medium text-gray-700 mb-2">
+                                <div class="flex justify-between text-xs font-medium mb-2" style="color: var(--text-kleur-black);">
                                     <span>Checklist voortgang</span>
-                                    <span class="text-blue-600">{{ $completion }}%</span>
+                                    <span style="color: var(--primary-color);">{{ $completion }}%</span>
                                 </div>
                                 <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
                                     <div class="h-2 rounded-full transition-all duration-500 {{ $completion === 100 ? 'bg-gradient-to-r from-green-400 to-green-500' : 'bg-gradient-to-r from-blue-400 to-blue-500' }}" 
@@ -126,19 +133,21 @@
                             <!-- Status Badge -->
                             <div class="flex justify-between items-center">
                                 @if($canMove)
-                                    <div class="inline-flex items-center px-2 py-1 text-xs font-semibold bg-gradient-to-r from-green-100 to-green-200 text-green-800 rounded-full">
-                                        <span class="w-2 h-2 bg-green-500 rounded-full mr-1"></span>
+                                    <div style="display: inline-flex; align-items: center; padding: 4px 8px; font-size: 12px; font-weight: 600; background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.3)); color: #16a34a; border-radius: 20px;">
+                                        <span style="width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; margin-right: 4px;"></span>
                                         Klaar voor volgende fase
                                     </div>
                                 @else
-                                    <div class="inline-flex items-center px-2 py-1 text-xs font-semibold bg-gradient-to-r from-yellow-100 to-orange-200 text-orange-800 rounded-full">
-                                        <span class="w-2 h-2 bg-orange-500 rounded-full mr-1"></span>
+                                    <div style="display: inline-flex; align-items: center; padding: 4px 8px; font-size: 12px; font-weight: 600; background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(249, 115, 22, 0.3)); color: #ea580c; border-radius: 20px;">
+                                        <span style="width: 8px; height: 8px; background-color: #f97316; border-radius: 50%; margin-right: 4px;"></span>
                                         In bewerking
                                     </div>
                                 @endif
                                 
                                 <a href="{{ route('pipeline.checklist', $car) }}" 
-                                   class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-200 transition-all duration-200"
+                                   style="display: inline-flex; align-items: center; padding: 4px 12px; background: linear-gradient(135deg, var(--third-color), var(--text-kleur-white)); color: var(--primary-color); border-radius: 20px; font-size: 12px; font-weight: 500; text-decoration: none; transition: all 0.2s ease;"
+                                   onmouseover="this.style.backgroundColor='var(--secondary-color)'; this.style.color='var(--text-kleur-white)'"
+                                   onmouseout="this.style.background='linear-gradient(135deg, var(--third-color), var(--text-kleur-white))'; this.style.color='var(--primary-color)'"
                                    @click.stop>
                                     <i class="fa-solid fa-list-check mr-1"></i>
                                     Checklist
@@ -348,7 +357,7 @@ function pipelineDrag() {
                     if (data.message) {
                         // Voeg een tijdelijke success melding toe
                         const successDiv = document.createElement('div');
-                        successDiv.className = 'fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50';
+                        successDiv.style.cssText = 'position: fixed; top: 16px; right: 16px; background-color: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); color: rgba(22, 163, 74, 1); padding: 12px 16px; border-radius: 8px; z-index: 50;';
                         successDiv.innerHTML = `<i class="fa-solid fa-check-circle mr-2"></i>${data.message}`;
                         document.body.appendChild(successDiv);
                         
@@ -363,7 +372,7 @@ function pipelineDrag() {
                 } else {
                     // Toon error bericht in een mooie modal
                     const errorDiv = document.createElement('div');
-                    errorDiv.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50 max-w-md';
+                    errorDiv.style.cssText = 'position: fixed; top: 16px; right: 16px; background-color: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: rgba(220, 38, 38, 1); padding: 12px 16px; border-radius: 8px; z-index: 50; max-width: 400px;';
                     errorDiv.innerHTML = `<i class="fa-solid fa-exclamation-circle mr-2"></i>${data.message}`;
                     document.body.appendChild(errorDiv);
                     
@@ -377,7 +386,7 @@ function pipelineDrag() {
                 
                 // Toon error bericht
                 const errorDiv = document.createElement('div');
-                errorDiv.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50';
+                errorDiv.style.cssText = 'position: fixed; top: 16px; right: 16px; background-color: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: rgba(220, 38, 38, 1); padding: 12px 16px; border-radius: 8px; z-index: 50;';
                 errorDiv.innerHTML = '<i class="fa-solid fa-exclamation-circle mr-2"></i>Er is een fout opgetreden bij het verplaatsen van de auto.';
                 document.body.appendChild(errorDiv);
                 

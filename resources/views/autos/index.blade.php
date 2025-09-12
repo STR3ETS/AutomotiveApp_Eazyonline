@@ -1,16 +1,19 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="bg-[var(--background-main)] min-h-full">
+<div class="min-h-full" style="background-color: var(--third-color);">
     <div class="max-w-7xl mx-auto px-4 py-8">
         <!-- Header with Add Button -->
-        <div class="flex justify-between items-center mb-8">
+        <div class="flex justify-between items-center mb-8 p-6 rounded-xl shadow-sm" style="background: linear-gradient(135deg, var(--primary-color)10, var(--secondary-color)20); border: 1px solid var(--secondary-color);">
             <div>
-                <h1 class="text-3xl font-bold text-[var(--text-primary)] mb-2">🚗 Auto Beheer</h1>
-                <p class="text-[var(--text-secondary)]">Overzicht van alle auto's in je voorraad</p>
+                <h1 class="text-3xl font-bold mb-2" style="color: var(--primary-color);">🚗 Auto Beheer</h1>
+                <p style="color: var(--secondary-color);">Overzicht van alle auto's in je voorraad</p>
             </div>
             <a href="{{ route('autos.create') }}" 
-               class="bg-[var(--status-info)] hover:bg-[var(--status-info-dark)] text-[var(--text-white)] font-semibold py-2 px-4 rounded-lg transition duration-[var(--transition-normal)] flex items-center gap-2">
+               class="font-semibold py-2 px-4 rounded-lg transition duration-200 flex items-center gap-2 shadow-sm hover:shadow-md"
+               style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: var(--text-kleur-white);"
+               onmouseover="this.style.transform='scale(1.05)'"
+               onmouseout="this.style.transform='scale(1)'">
                 <i class="fa-solid fa-plus"></i>
                 Nieuwe Auto Toevoegen
             </a>
@@ -18,41 +21,50 @@
 
         <!-- Success/Error Messages -->
         @if(session('success'))
-            <div class="bg-[var(--status-success-bg)] border border-[var(--status-success-border)] text-[var(--status-success-text)] px-4 py-3 rounded mb-6">
-                <i class="fa-solid fa-check-circle mr-2"></i>
+            <div class="px-4 py-3 rounded mb-6 shadow-sm" style="background: linear-gradient(135deg, var(--primary-color)20, var(--secondary-color)10); border: 1px solid var(--primary-color); color: var(--text-kleur-black);">
+                <i class="fa-solid fa-check-circle mr-2" style="color: var(--primary-color);"></i>
                 {{ session('success') }}
             </div>
         @endif
 
         @if(session('error'))
-            <div class="bg-[var(--status-danger-bg)] border border-[var(--status-danger-light)] text-[var(--status-danger-text)] px-4 py-3 rounded mb-6">
-                <i class="fa-solid fa-exclamation-circle mr-2"></i>
+            <div class="px-4 py-3 rounded mb-6 shadow-sm" style="background: linear-gradient(135deg, var(--third-color), var(--secondary-color)20); border: 1px solid var(--primary-color); color: var(--text-kleur-black);">
+                <i class="fa-solid fa-exclamation-circle mr-2" style="color: var(--primary-color);"></i>
                 {{ session('error') }}
             </div>
         @endif
 
         <!-- Search & Filters -->
-        <div class="bg-[var(--background-card)] rounded-xl shadow-sm border border-[var(--border-light)] p-6 mb-6 card-hover">
+        <div class="rounded-xl shadow-sm p-6 mb-6 transition-all duration-300 hover:shadow-md" style="background-color: var(--text-kleur-white); border: 1px solid var(--third-color);">
             <form method="GET" action="{{ route('autos.index') }}" class="flex flex-wrap gap-4">
                 <div class="flex-1 min-w-64">
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fa-solid fa-search text-[var(--text-tertiary)]"></i>
+                            <i class="fa-solid fa-search" style="color: var(--secondary-color);"></i>
                         </div>
                         <input type="text" 
                                name="search" 
                                value="{{ request('search') }}"
                                placeholder="Zoek op kenteken, merk, model..." 
-                               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                               class="w-full pl-10 pr-4 py-2 border rounded-lg transition-all duration-200"
+                               style="border-color: var(--third-color); color: var(--text-kleur-black);"
+                               onfocus="this.style.borderColor='var(--primary-color)'; this.style.boxShadow='0 0 0 2px var(--primary-color)30'"
+                               onblur="this.style.borderColor='var(--third-color)'; this.style.boxShadow='none'">
                     </div>
                 </div>
                 <button type="submit" 
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition duration-200 flex items-center gap-2 shadow-sm hover:shadow-md">
+                        class="px-6 py-2 rounded-lg transition duration-200 flex items-center gap-2 shadow-sm hover:shadow-md"
+                        style="background-color: var(--primary-color); color: var(--text-kleur-white);"
+                        onmouseover="this.style.backgroundColor='var(--secondary-color)'"
+                        onmouseout="this.style.backgroundColor='var(--primary-color)'">
                     <i class="fa-solid fa-search"></i>Zoeken
                 </button>
                 @if(request('search'))
                     <a href="{{ route('autos.index') }}" 
-                       class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2 rounded-lg transition duration-200 flex items-center gap-2">
+                       class="px-6 py-2 rounded-lg transition duration-200 flex items-center gap-2"
+                       style="background-color: var(--third-color); color: var(--text-kleur-black);"
+                       onmouseover="this.style.backgroundColor='var(--secondary-color)'; this.style.color='var(--text-kleur-white)'"
+                       onmouseout="this.style.backgroundColor='var(--third-color)'; this.style.color='var(--text-kleur-black)'">
                         <i class="fa-solid fa-times"></i>Reset
                     </a>
                 @endif
@@ -60,22 +72,22 @@
         </div>
 
         <!-- Cars Table -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover-card">
+        <div class="rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md" style="background-color: var(--text-kleur-white); border: 1px solid var(--third-color);">
             @if($cars->count() > 0)
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
+                    <table class="min-w-full">
+                        <thead style="background: linear-gradient(135deg, var(--third-color), var(--secondary-color)20);">
                             <tr>
-                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style="color: var(--text-kleur-black);">
                                     Auto
                                 </th>
-                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style="color: var(--text-kleur-black);">
                                     Details
                                 </th>
-                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style="color: var(--text-kleur-black);">
                                     Fase
                                 </th>
-                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style="color: var(--text-kleur-black);">
                                     Toegewezen aan
                                 </th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -125,15 +137,15 @@
                                         @if($car->stage)
                                             @php
                                                 $stageColors = [
-                                                    'Intake' => 'bg-yellow-100 text-yellow-800',
-                                                    'Technische controle' => 'bg-blue-100 text-blue-800',
-                                                    'Herstel & Onderhoud' => 'bg-orange-100 text-orange-800',
-                                                    'Commercieel gereed' => 'bg-purple-100 text-purple-800',
-                                                    'Verkoop klaar' => 'bg-green-100 text-green-800'
+                                                    'Intake' => 'background: linear-gradient(135deg, #fbbf24, #f59e0b); color: var(--text-kleur-white);',
+                                                    'Technische controle' => 'background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: var(--text-kleur-white);',
+                                                    'Herstel & Onderhoud' => 'background: linear-gradient(135deg, #f97316, #ea580c); color: var(--text-kleur-white);',
+                                                    'Commercieel gereed' => 'background: linear-gradient(135deg, #a855f7, #9333ea); color: var(--text-kleur-white);',
+                                                    'Verkoop klaar' => 'background: linear-gradient(135deg, #22c55e, #16a34a); color: var(--text-kleur-white);'
                                                 ];
-                                                $colorClass = $stageColors[$car->stage->name] ?? 'bg-gray-100 text-gray-800';
+                                                $colorStyle = $stageColors[$car->stage->name] ?? 'background-color: var(--third-color); color: var(--text-kleur-black);';
                                             @endphp
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $colorClass }}">
+                                            <span style="display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; {{ $colorStyle }}">
                                                 {{ $car->stage->name }}
                                             </span>
                                         @else
@@ -166,17 +178,21 @@
                                     </td>
                                     <td class="px-6 py-4 text-right text-sm font-medium space-x-3">
                                         <a href="{{ route('autos.show', $car) }}" 
-                                           class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-200 transition-all duration-200"
+                                           style="display: inline-flex; align-items: center; padding: 4px 12px; background: linear-gradient(135deg, var(--third-color), var(--text-kleur-white)); color: var(--primary-color); border-radius: 20px; font-size: 12px; font-weight: 500; text-decoration: none; transition: all 0.2s ease;"
+                                           onmouseover="this.style.backgroundColor='var(--primary-color)'; this.style.color='var(--text-kleur-white)'"
+                                           onmouseout="this.style.background='linear-gradient(135deg, var(--third-color), var(--text-kleur-white))'; this.style.color='var(--primary-color)'"
                                            title="Bekijken">
                                             <i class="fa-solid fa-eye mr-1"></i> Bekijk
                                         </a>
                                         <a href="{{ route('autos.edit', $car) }}" 
-                                           class="inline-flex items-center px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium hover:bg-yellow-200 transition-all duration-200"
+                                           style="display: inline-flex; align-items: center; padding: 4px 12px; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: var(--text-kleur-white); border-radius: 20px; font-size: 12px; font-weight: 500; text-decoration: none; transition: all 0.2s ease;"
+                                           onmouseover="this.style.background='linear-gradient(135deg, #f59e0b, #d97706)'"
+                                           onmouseout="this.style.background='linear-gradient(135deg, #fbbf24, #f59e0b)'"
                                            title="Bewerken">
                                             <i class="fa-solid fa-edit mr-1"></i> Bewerk
                                         </a>
                                         @if($car->images->count() > 0)
-                                            <span class="inline-flex items-center px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium" title="{{ $car->images->count() }} foto's">
+                                            <span style="display: inline-flex; align-items: center; padding: 4px 8px; background: linear-gradient(135deg, #22c55e, #16a34a); color: var(--text-kleur-white); border-radius: 20px; font-size: 12px; font-weight: 500;" title="{{ $car->images->count() }} foto's">
                                                 <i class="fa-solid fa-images mr-1"></i> {{ $car->images->count() }}
                                             </span>
                                         @else
@@ -191,7 +207,9 @@
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" 
-                                                    class="inline-flex items-center px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium hover:bg-red-200 transition-all duration-200"
+                                                    style="display: inline-flex; align-items: center; padding: 4px 12px; background: linear-gradient(135deg, #ef4444, #dc2626); color: var(--text-kleur-white); border-radius: 20px; font-size: 12px; font-weight: 500; border: none; cursor: pointer; transition: all 0.2s ease;"
+                                                    onmouseover="this.style.background='linear-gradient(135deg, #dc2626, #b91c1c)'"
+                                                    onmouseout="this.style.background='linear-gradient(135deg, #ef4444, #dc2626)'"
                                                     title="Verwijderen">
                                                 <i class="fa-solid fa-trash mr-1"></i> Verwijder
                                             </button>
