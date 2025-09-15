@@ -111,6 +111,16 @@ class Car extends Model
         return $this->hasMany(CarImage::class);
     }
 
+    public function videos()
+    {
+        return $this->hasMany(CarVideo::class)->ordered();
+    }
+
+    public function featuredVideo()
+    {
+        return $this->hasOne(CarVideo::class)->where('is_featured', true);
+    }
+
     public function primaryImage()
     {
         return $this->hasOne(CarImage::class)->where('is_primary', true);

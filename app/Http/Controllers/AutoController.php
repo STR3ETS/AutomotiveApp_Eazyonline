@@ -107,7 +107,7 @@ return redirect()->route('autos.show', $auto)
      */
     public function show(Car $auto)
     {
-        $auto->load(['stage', 'checklists.stage', 'repairs.parts', 'appointments', 'sales.customer', 'currentAssignment.employee']);
+        $auto->load(['stage', 'checklists.stage', 'repairs.parts', 'appointments', 'sales.customer', 'currentAssignment.employee', 'images', 'videos']);
         return view('autos.show', compact('auto'));
     }
 

@@ -17,6 +17,7 @@ use App\Http\Controllers\TenantTestController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\CarImageController;
+use App\Http\Controllers\CarVideoController;
 use App\Http\Controllers\MarketplaceController;
 use Illuminate\Support\Facades\Auth;
 
@@ -110,6 +111,14 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::delete('/images/{carImage}', [CarImageController::class, 'destroy'])->name('cars.images.destroy');
     Route::post('/images/{carImage}/make-primary', [CarImageController::class, 'makePrimary'])->name('cars.images.make-primary');
     Route::post('/cars/{car}/images/reorder', [CarImageController::class, 'updateOrder'])->name('cars.images.reorder');
+
+    // Car Videos
+    Route::get('/cars/{car}/videos', [CarVideoController::class, 'index'])->name('cars.videos.index');
+    Route::post('/cars/{car}/videos', [CarVideoController::class, 'store'])->name('cars.videos.store');
+    Route::put('/cars/{car}/videos/{video}', [CarVideoController::class, 'update'])->name('cars.videos.update');
+    Route::delete('/cars/{car}/videos/{video}', [CarVideoController::class, 'destroy'])->name('cars.videos.destroy');
+    Route::post('/cars/{car}/videos/{video}/make-featured', [CarVideoController::class, 'makeFeatured'])->name('cars.videos.make-featured');
+    Route::post('/cars/{car}/videos/reorder', [CarVideoController::class, 'updateSortOrder'])->name('cars.videos.reorder');
 
     // Marketplace Publishing
     Route::get('/cars/{car}/marketplace', [MarketplaceController::class, 'show'])->name('cars.marketplace.show');

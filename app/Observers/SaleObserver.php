@@ -22,7 +22,7 @@ class SaleObserver
     {
         // Check if payment_status changed to 'paid' AND the sale is actually fully paid
         if ($sale->isDirty('payment_status') && $sale->payment_status === 'paid') {
-            
+
             // Double check if the sale is actually fully paid
             if (!$this->carSaleService->isFullyPaid($sale)) {
                 Log::warning('Sale marked as paid but not fully paid', [
@@ -42,7 +42,7 @@ class SaleObserver
 
             try {
                 $this->carSaleService->moveCarToSoldCars($sale);
-                
+
                 Log::info('Car successfully moved to sold_cars', [
                     'sale_id' => $sale->id,
                     'car_id' => $sale->car_id
@@ -53,7 +53,7 @@ class SaleObserver
                     'car_id' => $sale->car_id,
                     'error' => $e->getMessage()
                 ]);
-                
+
                 // We could optionally throw the exception to prevent the sale update
                 // throw $e;
             }
