@@ -16,30 +16,28 @@ class MarketplaceController extends Controller
     {
         $car->load(['images' => function($query) {
             $query->orderBy('sort_order')->orderBy('created_at');
-        }, 'listings.listingTemplate', 'stage']);
+        }, 'listings', 'stage']);
 
-        $templates = ListingTemplate::active()->get();
-
-        return view('marketplace.show', compact('car', 'templates'));
+        return view('marketplace.show', compact('car'));
     }
 
     public function preview(Request $request, Car $car)
     {
         try {
             $request->validate([
-                'template_id' => 'required|exists:listing_templates,id',
                 'platform' => 'required|in:marktplaats,instagram,facebook,autotrack',
                 'image_ids' => 'array',
                 'image_ids.*' => 'exists:car_images,id',
-                'custom_title' => 'nullable|string|max:255',
-                'custom_description' => 'nullable|string|max:5000'
+                'title' => 'nullable|string|max:255',
+                'description' => 'nullable|string|max:5000'
             ]);
 
-            $template = ListingTemplate::findOrFail($request->template_id);
+            // Generate smart content based on platform
+            $content = $this->generateSmartContent($car, $request->platform);
             
-            // Generate listing content
-            $title = $request->custom_title ?: $template->generateTitle($car);
-            $description = $request->custom_description ?: $template->generateDescription($car);
+            // Use custom content if provided
+            $title = $request->title ?: $content['title'];
+            $description = $request->description ?: $content['description'];
             
             // Select images to use
             $imageIds = $request->image_ids ?: $car->images->take(5)->pluck('id')->toArray();
@@ -81,19 +79,19 @@ class MarketplaceController extends Controller
     public function createListing(Request $request, Car $car)
     {
         $request->validate([
-            'template_id' => 'required|exists:listing_templates,id',
             'platform' => 'required|in:marktplaats,instagram,facebook,autotrack',
             'image_ids' => 'array',
             'image_ids.*' => 'exists:car_images,id',
-            'custom_title' => 'string|max:255',
-            'custom_description' => 'string|max:5000'
+            'title' => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:5000'
         ]);
 
-        $template = ListingTemplate::findOrFail($request->template_id);
+        // Generate smart content based on platform
+        $content = $this->generateSmartContent($car, $request->platform);
         
-        // Generate listing content
-        $title = $request->custom_title ?: $template->generateTitle($car);
-        $description = $request->custom_description ?: $template->generateDescription($car);
+        // Use custom content if provided
+        $title = $request->title ?: $content['title'];
+        $description = $request->description ?: $content['description'];
         
         // Select images to use
         $imageIds = $request->image_ids ?: $car->images->take(5)->pluck('id')->toArray();
@@ -102,7 +100,7 @@ class MarketplaceController extends Controller
         $listing = CarListing::create([
             'car_id' => $car->id,
             'company_id' => $car->company_id,
-            'listing_template_id' => $template->id,
+            'listing_template_id' => null, // No longer using templates
             'platform' => $request->platform,
             'status' => 'draft',
             'generated_title' => $title,
@@ -215,6 +213,49 @@ class MarketplaceController extends Controller
         return [
             'external_id' => 'FB_' . time() . '_' . $listing->id,
             'url' => 'https://www.facebook.com/marketplace/item/' . rand(100000000000000, 999999999999999)
+        ];
+    }
+
+    /**
+     * Generate smart content based on car data and platform
+     */
+    private function generateSmartContent(Car $car, string $platform): array
+    {
+        $platformTemplates = [
+            'marktplaats' => [
+                'title' => '{brand} {model} ({year}) - €{price}',
+                'description' => "Te koop: {brand} {model}\n\n🚗 Bouwjaar: {year}\n📊 Kilometerstand: {mileage} km\n💰 Prijs: €{price}\n\n✅ Dealer occasie\n✅ Garantie mogelijk\n✅ Inruil welkom\n\nInteresse? Neem contact op voor meer informatie of een proefrit!"
+            ],
+            'instagram' => [
+                'title' => '🚗 {brand} {model} | {year} | €{price}',
+                'description' => "🚗 {brand} {model} ({year})\n\n📍 Nu beschikbaar bij ons!\n🔥 {mileage}km | €{price}\n\n#{brand_lower} #{model_lower} #auto #occasions #dealer #{year}"
+            ],
+            'facebook' => [
+                'title' => '{brand} {model} - {year} | {mileage}km',
+                'description' => "{brand} {model} te koop!\n\nBouwjaar: {year}\nKilometerstand: {mileage} km\nDealer prijs: €{price}\n\nBetrouwbare dealer met garantie en service.\nBericht ons voor meer info!"
+            ]
+        ];
+
+        $template = $platformTemplates[$platform] ?? $platformTemplates['marktplaats'];
+        
+        // Prepare replacement values
+        $replacements = [
+            '{brand}' => $car->brand,
+            '{model}' => $car->model,
+            '{year}' => $car->year,
+            '{price}' => number_format($car->price, 0, ',', '.'),
+            '{mileage}' => number_format($car->mileage, 0, ',', '.'),
+            '{brand_lower}' => strtolower($car->brand),
+            '{model_lower}' => strtolower(str_replace(' ', '', $car->model))
+        ];
+
+        // Generate title and description
+        $title = str_replace(array_keys($replacements), array_values($replacements), $template['title']);
+        $description = str_replace(array_keys($replacements), array_values($replacements), $template['description']);
+
+        return [
+            'title' => $title,
+            'description' => $description
         ];
     }
 

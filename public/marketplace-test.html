@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketplace Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-8">
+        <h1 class="text-3xl font-bold mb-8">Marketplace System Test</h1>
+        
+        <!-- Platform Tabs Test -->
+        <div class="bg-white rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Platform Switching Test</h2>
+            <div class="flex border-b border-gray-200 mb-6">
+                <button onclick="testSwitchPlatform('marktplaats')" 
+                        class="platform-tab flex-1 py-3 px-4 text-center font-medium border-b-2 transition-colors duration-200 border-orange-500 text-orange-600"
+                        id="tab-marktplaats">
+                    <i class="fa-solid fa-shopping-cart mr-2"></i>
+                    Marktplaats
+                </button>
+                <button onclick="testSwitchPlatform('instagram')" 
+                        class="platform-tab flex-1 py-3 px-4 text-center font-medium border-b-2 transition-colors duration-200 border-transparent text-gray-500"
+                        id="tab-instagram">
+                    <i class="fa-brands fa-instagram mr-2"></i>
+                    Instagram
+                </button>
+                <button onclick="testSwitchPlatform('facebook')" 
+                        class="platform-tab flex-1 py-3 px-4 text-center font-medium border-b-2 transition-colors duration-200 border-transparent text-gray-500"
+                        id="tab-facebook">
+                    <i class="fa-brands fa-facebook mr-2"></i>
+                    Facebook
+                </button>
+            </div>
+            <div id="testPreview" class="border border-gray-200 rounded p-4 min-h-32">
+                Preview will appear here...
+            </div>
+        </div>
+        
+        <!-- Image Selection Test -->
+        <div class="bg-white rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Image Selection Test</h2>
+            <div class="grid grid-cols-4 gap-3" id="image-selector">
+                <div class="relative cursor-pointer group" onclick="testToggleImageSelection(1)">
+                    <div class="w-full h-20 bg-gray-300 rounded-lg border-2 border-transparent transition-all duration-200 flex items-center justify-center"
+                         id="image-1">
+                        <span class="text-gray-600">Image 1</span>
+                    </div>
+                    <div class="absolute inset-0 bg-blue-500 bg-opacity-0 rounded-lg flex items-center justify-center transition-all duration-200" 
+                         id="overlay-1">
+                        <i class="fa-solid fa-check text-white text-xl opacity-0 transition-opacity duration-200" 
+                           id="check-1"></i>
+                    </div>
+                </div>
+                <div class="relative cursor-pointer group" onclick="testToggleImageSelection(2)">
+                    <div class="w-full h-20 bg-gray-300 rounded-lg border-2 border-transparent transition-all duration-200 flex items-center justify-center"
+                         id="image-2">
+                        <span class="text-gray-600">Image 2</span>
+                    </div>
+                    <div class="absolute inset-0 bg-blue-500 bg-opacity-0 rounded-lg flex items-center justify-center transition-all duration-200" 
+                         id="overlay-2">
+                        <i class="fa-solid fa-check text-white text-xl opacity-0 transition-opacity duration-200" 
+                           id="check-2"></i>
+                    </div>
+                </div>
+                <div class="relative cursor-pointer group" onclick="testToggleImageSelection(3)">
+                    <div class="w-full h-20 bg-gray-300 rounded-lg border-2 border-transparent transition-all duration-200 flex items-center justify-center"
+                         id="image-3">
+                        <span class="text-gray-600">Image 3</span>
+                    </div>
+                    <div class="absolute inset-0 bg-blue-500 bg-opacity-0 rounded-lg flex items-center justify-center transition-all duration-200" 
+                         id="overlay-3">
+                        <i class="fa-solid fa-check text-white text-xl opacity-0 transition-opacity duration-200" 
+                           id="check-3"></i>
+                    </div>
+                </div>
+            </div>
+            <p class="text-sm text-gray-600 mt-3">
+                Selected images: <span id="selectedCount">0</span>
+            </p>
+        </div>
+        
+        <!-- Toast Test -->
+        <div class="bg-white rounded-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">Toast Notifications Test</h2>
+            <div class="space-x-3">
+                <button onclick="testShowToast('Success message!', 'success')" 
+                        class="bg-green-600 text-white px-4 py-2 rounded">Success Toast</button>
+                <button onclick="testShowToast('Error message!', 'error')" 
+                        class="bg-red-600 text-white px-4 py-2 rounded">Error Toast</button>
+                <button onclick="testShowToast('Warning message!', 'warning')" 
+                        class="bg-yellow-600 text-white px-4 py-2 rounded">Warning Toast</button>
+                <button onclick="testShowToast('Info message!', 'info')" 
+                        class="bg-blue-600 text-white px-4 py-2 rounded">Info Toast</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Test variables
+        let testSelectedImages = [];
+        let testCurrentPlatform = 'marktplaats';
+        let testCarData = {
+            brand: 'BMW',
+            model: 'X5',
+            year: 2020,
+            price: 45000,
+            mileage: 75000
+        };
+        
+        let testPlatformPresets = {
+            marktplaats: {
+                color: 'orange',
+                maxImages: 10,
+                titleTemplate: '{brand} {model} ({year}) - €{price}',
+            },
+            instagram: {
+                color: 'purple',
+                maxImages: 10,
+                titleTemplate: '🚗 {brand} {model} | {year} | €{price}',
+            },
+            facebook: {
+                color: 'blue',
+                maxImages: 10,
+                titleTemplate: '{brand} {model} - {year} | {mileage}km',
+            }
+        };
+
+        // Test functions
+        function testSwitchPlatform(platform) {
+            console.log('Testing platform switch to:', platform);
+            testCurrentPlatform = platform;
+            
+            // Update tabs
+            document.querySelectorAll('.platform-tab').forEach(tab => {
+                tab.style.borderBottomColor = 'transparent';
+                tab.style.color = '#6b7280';
+            });
+            
+            const activeTab = document.getElementById(`tab-${platform}`);
+            if (activeTab) {
+                if (platform === 'marktplaats') {
+                    activeTab.style.borderBottomColor = '#ff6100';
+                    activeTab.style.color = '#ff6100';
+                } else if (platform === 'instagram') {
+                    activeTab.style.borderBottomColor = '#e4405f';
+                    activeTab.style.color = '#e4405f';
+                } else if (platform === 'facebook') {
+                    activeTab.style.borderBottomColor = '#1877f2';
+                    activeTab.style.color = '#1877f2';
+                }
+            }
+            
+            // Update preview
+            testGeneratePreview();
+        }
+        
+        function testToggleImageSelection(imageId) {
+            console.log('Testing image selection for:', imageId);
+            
+            const image = document.getElementById(`image-${imageId}`);
+            const overlay = document.getElementById(`overlay-${imageId}`);
+            const check = document.getElementById(`check-${imageId}`);
+
+            if (testSelectedImages.includes(imageId)) {
+                // Deselect
+                testSelectedImages = testSelectedImages.filter(id => id !== imageId);
+                image.classList.remove('border-blue-500');
+                overlay.classList.remove('bg-opacity-30');
+                overlay.classList.add('bg-opacity-0');
+                check.classList.remove('opacity-100');
+            } else {
+                // Select
+                testSelectedImages.push(imageId);
+                image.classList.add('border-blue-500');
+                overlay.classList.remove('bg-opacity-0');
+                overlay.classList.add('bg-opacity-30');
+                check.classList.add('opacity-100');
+            }
+
+            document.getElementById('selectedCount').textContent = testSelectedImages.length;
+            testGeneratePreview();
+        }
+        
+        function testGeneratePreview() {
+            const container = document.getElementById('testPreview');
+            const preset = testPlatformPresets[testCurrentPlatform];
+            
+            let title = preset.titleTemplate
+                .replace('{brand}', testCarData.brand)
+                .replace('{model}', testCarData.model)
+                .replace('{year}', testCarData.year)
+                .replace('{price}', testCarData.price.toLocaleString('nl-NL'))
+                .replace('{mileage}', testCarData.mileage.toLocaleString('nl-NL'));
+            
+            container.innerHTML = `
+                <div class="p-4 border border-${preset.color}-200 rounded bg-${preset.color}-50">
+                    <h3 class="font-bold text-lg mb-2">${title}</h3>
+                    <p class="text-sm text-gray-600">Platform: ${testCurrentPlatform}</p>
+                    <p class="text-sm text-gray-600">Selected images: ${testSelectedImages.length}</p>
+                </div>
+            `;
+        }
+        
+        function testShowToast(message, type = 'info') {
+            const colors = {
+                success: 'bg-green-600',
+                error: 'bg-red-600',
+                warning: 'bg-yellow-600',
+                info: 'bg-blue-600'
+            };
+            
+            const toast = document.createElement('div');
+            toast.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300`;
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full');
+            }, 100);
+            
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 3000);
+        }
+        
+        // Initialize test
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Test page initialized');
+            testGeneratePreview();
+        });
+    </script>
+</body>
+</html>

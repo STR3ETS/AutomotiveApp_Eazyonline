@@ -23,7 +23,10 @@ class CarListing extends Model
         'generated_description',
         'used_images',
         'platform_response',
+        'platform_config',
+        'custom_hashtags',
         'published_at',
+        'scheduled_publish_at',
         'expires_at',
         'error_message'
     ];
@@ -31,7 +34,9 @@ class CarListing extends Model
     protected $casts = [
         'used_images' => 'array',
         'platform_response' => 'array',
+        'platform_config' => 'array',
         'published_at' => 'datetime',
+        'scheduled_publish_at' => 'datetime',
         'expires_at' => 'datetime'
     ];
 
@@ -48,7 +53,7 @@ class CarListing extends Model
 
     public function listingTemplate(): BelongsTo
     {
-        return $this->belongsTo(ListingTemplate::class);
+        return $this->belongsTo(ListingTemplate::class)->withDefault();
     }
 
     // Status methods
