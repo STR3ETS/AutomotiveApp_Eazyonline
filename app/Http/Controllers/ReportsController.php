@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\Car;
 use App\Models\Sale;
+use App\Models\SoldCar;
 use App\Models\Repair;
 use App\Models\CarStage;
 use App\Models\Customer;
@@ -34,13 +35,21 @@ class ReportsController extends Controller
         // 📅 Recent Performance
         $performanceData = $this->getPerformanceData();
         
+        // 🚗 Recent Sales Data
+        $recentSalesData = $this->getRecentSalesData();
+        
+        // ⚠️ Pending Deliveries
+        $pendingDeliveries = $this->getPendingDeliveries();
+        
         return view('reports.index', compact(
             'kpis',
             'pipelineData', 
             'financialData',
             'repairData',
             'customerData',
-            'performanceData'
+            'performanceData',
+            'recentSalesData',
+            'pendingDeliveries'
         ));
     }
     
@@ -49,27 +58,18 @@ class ReportsController extends Controller
         $now = Carbon::now();
         $thisMonth = $now->startOfMonth();
         $lastMonth = $now->copy()->subMonth()->startOfMonth();
+        $lastMonthEnd = $now->copy()->subMonth()->endOfMonth();
         
-        // Total cars in system
-        $totalCars = Car::count();
+        // Total cars in system (active cars + sold cars)
+        $totalCars = Car::count() + SoldCar::count();
         
-        // Cars sold this month
-        $salesThisMonth = Sale::where('status', 'delivered')
-            ->where('sold_at', '>=', $thisMonth)
-            ->count();
-            
-        $salesLastMonth = Sale::where('status', 'delivered')
-            ->whereBetween('sold_at', [$lastMonth, $thisMonth])
-            ->count();
+        // Cars sold this month (from sold_cars table)
+        $salesThisMonth = SoldCar::where('sold_at', '>=', $thisMonth)->count();
+        $salesLastMonth = SoldCar::whereBetween('sold_at', [$lastMonth, $lastMonthEnd])->count();
         
-        // Revenue this month
-        $revenueThisMonth = Sale::where('status', 'delivered')
-            ->where('sold_at', '>=', $thisMonth)
-            ->sum('sale_price');
-            
-        $revenueLastMonth = Sale::where('status', 'delivered')
-            ->whereBetween('sold_at', [$lastMonth, $thisMonth])
-            ->sum('sale_price');
+        // Revenue this month (from sold_cars table)
+        $revenueThisMonth = SoldCar::where('sold_at', '>=', $thisMonth)->sum('sale_price');
+        $revenueLastMonth = SoldCar::whereBetween('sold_at', [$lastMonth, $lastMonthEnd])->sum('sale_price');
         
         // Active repairs
         $activeRepairs = Repair::whereIn('status', ['gepland', 'bezig', 'wachten_op_onderdeel'])->count();
@@ -80,9 +80,9 @@ class ReportsController extends Controller
         return [
             'total_cars' => $totalCars,
             'sales_this_month' => $salesThisMonth,
-            'sales_growth' => $salesLastMonth > 0 ? round((($salesThisMonth - $salesLastMonth) / $salesLastMonth) * 100, 1) : 0,
+            'sales_growth' => $salesLastMonth > 0 ? round((($salesThisMonth - $salesLastMonth) / $salesLastMonth) * 100, 1) : ($salesThisMonth > 0 ? 100 : 0),
             'revenue_this_month' => $revenueThisMonth,
-            'revenue_growth' => $revenueLastMonth > 0 ? round((($revenueThisMonth - $revenueLastMonth) / $revenueLastMonth) * 100, 1) : 0,
+            'revenue_growth' => $revenueLastMonth > 0 ? round((($revenueThisMonth - $revenueLastMonth) / $revenueLastMonth) * 100, 1) : ($revenueThisMonth > 0 ? 100 : 0),
             'active_repairs' => $activeRepairs,
             'avg_days_pipeline' => $avgDaysInPipeline
         ];
@@ -117,20 +117,34 @@ class ReportsController extends Controller
     
     private function getFinancialData()
     {
-        $monthlyRevenue = Sale::where('status', 'delivered')
-            ->selectRaw('MONTH(sold_at) as month, YEAR(sold_at) as year, SUM(sale_price) as revenue, COUNT(*) as sales_count')
+        // Monthly revenue from sold cars - ensure we have data for all 12 months
+        $monthlyRevenueRaw = SoldCar::selectRaw('MONTH(sold_at) as month, YEAR(sold_at) as year, SUM(sale_price) as revenue, COUNT(*) as sales_count')
             ->whereYear('sold_at', Carbon::now()->year)
-            ->groupBy('year', 'month')
+            ->groupBy(DB::raw('YEAR(sold_at)'), DB::raw('MONTH(sold_at)'))
             ->orderBy('month')
-            ->get();
+            ->get()
+            ->keyBy('month');
         
-        // Top performing car brands
-        $brandPerformance = DB::table('sales')
-            ->join('cars', 'sales.car_id', '=', 'cars.id')
-            ->where('sales.status', 'delivered')
-            ->where('sales.company_id', config('app.current_company_id'))
-            ->selectRaw('cars.brand, COUNT(*) as sales_count, AVG(sales.sale_price) as avg_price, SUM(sales.sale_price) as total_revenue')
-            ->groupBy('cars.brand')
+        // Fill in missing months with zero values
+        $monthlyRevenue = collect();
+        for ($i = 1; $i <= 12; $i++) {
+            if ($monthlyRevenueRaw->has($i)) {
+                $monthlyRevenue->push($monthlyRevenueRaw->get($i));
+            } else {
+                $monthlyRevenue->push((object)[
+                    'month' => $i,
+                    'year' => Carbon::now()->year,
+                    'revenue' => 0,
+                    'sales_count' => 0
+                ]);
+            }
+        }
+        
+        // Top performing car brands from sold cars
+        $brandPerformance = SoldCar::selectRaw('brand, COUNT(*) as sales_count, AVG(sale_price) as avg_price, SUM(sale_price) as total_revenue')
+            ->whereNotNull('sold_at')
+            ->whereNotNull('brand')
+            ->groupBy('brand')
             ->orderByDesc('total_revenue')
             ->limit(5)
             ->get();
@@ -151,6 +165,7 @@ class ReportsController extends Controller
     {
         // Most common repairs
         $commonRepairs = Repair::selectRaw('description, COUNT(*) as frequency, AVG(cost_estimate) as avg_cost')
+            ->whereNotNull('description')
             ->groupBy('description')
             ->orderByDesc('frequency')
             ->limit(5)
@@ -158,13 +173,14 @@ class ReportsController extends Controller
         
         // Repair status distribution
         $repairStatus = Repair::selectRaw('status, COUNT(*) as count')
+            ->whereNotNull('status')
             ->groupBy('status')
             ->get();
         
         // Average repair cost per month
         $avgRepairCost = Repair::selectRaw('MONTH(created_at) as month, AVG(cost_estimate) as avg_cost')
             ->whereYear('created_at', Carbon::now()->year)
-            ->groupBy('month')
+            ->groupBy(DB::raw('MONTH(created_at)'))
             ->orderBy('month')
             ->get();
         
@@ -185,13 +201,15 @@ class ReportsController extends Controller
             ->whereYear('created_at', Carbon::now()->year)
             ->count();
         
-        // Customer conversion rate (appointments to sales)
+        // Customer conversion rate (appointments to actual sales)
         $totalAppointments = Appointment::count();
-        $totalSales = Sale::count();
-        $conversionRate = $totalAppointments > 0 ? round(($totalSales / $totalAppointments) * 100, 1) : 0;
+        $totalActualSales = SoldCar::count(); // Use sold cars for actual completed sales
+        $conversionRate = $totalAppointments > 0 ? round(($totalActualSales / $totalAppointments) * 100, 1) : 0;
         
-        // Top customers by purchase count
-        $topCustomers = Customer::withCount('sales')
+        // Top customers by purchase count (from sold cars)
+        $topCustomers = SoldCar::selectRaw('customer_name as name, customer_email as email, COUNT(*) as sales_count')
+            ->whereNotNull('customer_name')
+            ->groupBy('customer_name', 'customer_email')
             ->having('sales_count', '>', 0)
             ->orderByDesc('sales_count')
             ->limit(5)
@@ -207,18 +225,16 @@ class ReportsController extends Controller
     
     private function getPerformanceData()
     {
-        // Cars completed this week
+        // Cars completed this week (sold cars)
         $startOfWeek = Carbon::now()->startOfWeek();
-        $carsCompletedThisWeek = Sale::where('status', 'delivered')
-            ->where('sold_at', '>=', $startOfWeek)
-            ->count();
+        $carsCompletedThisWeek = SoldCar::where('sold_at', '>=', $startOfWeek)->count();
         
         // Upcoming appointments
         $upcomingAppointments = Appointment::where('date', '>=', Carbon::today())
             ->where('date', '<=', Carbon::today()->addDays(7))
             ->count();
         
-        // Cars awaiting action
+        // Cars awaiting action (active cars with incomplete checklists)
         $carsAwaitingAction = Car::whereHas('checklists', function($query) {
             $query->where('is_completed', false);
         })->count();
@@ -232,11 +248,8 @@ class ReportsController extends Controller
     
     private function calculateAverageDaysInPipeline()
     {
-        // Calculate average days from first stage to sale
-        $completedSales = Sale::where('status', 'delivered')
-            ->with('car')
-            ->whereNotNull('sold_at')
-            ->get();
+        // Calculate average days from car creation to sale completion using sold cars
+        $completedSales = SoldCar::whereNotNull('sold_at')->get();
         
         if ($completedSales->isEmpty()) {
             return 0;
@@ -245,9 +258,10 @@ class ReportsController extends Controller
         $totalDays = 0;
         $count = 0;
         
-        foreach ($completedSales as $sale) {
-            if ($sale->car && $sale->car->created_at && $sale->sold_at) {
-                $days = $sale->car->created_at->diffInDays($sale->sold_at);
+        foreach ($completedSales as $soldCar) {
+            // Use the sold car's created_at as proxy for when the car entered the system
+            if ($soldCar->created_at && $soldCar->sold_at) {
+                $days = $soldCar->created_at->diffInDays($soldCar->sold_at);
                 $totalDays += $days;
                 $count++;
             }
@@ -308,5 +322,65 @@ class ReportsController extends Controller
         }
         
         return $completionRates;
+    }
+
+    private function getRecentSalesData()
+    {
+        // Recent sales (last 30 days)
+        $recentSales = SoldCar::with([])
+            ->where('sold_at', '>=', Carbon::now()->subDays(30))
+            ->orderByDesc('sold_at')
+            ->limit(10)
+            ->get()
+            ->map(function($soldCar) {
+                return [
+                    'license_plate' => $soldCar->license_plate,
+                    'brand_model' => $soldCar->brand . ' ' . $soldCar->model,
+                    'customer_name' => $soldCar->customer_name,
+                    'sale_price' => $soldCar->sale_price,
+                    'sold_at' => $soldCar->sold_at,
+                    'profit' => $soldCar->sale_price - ($soldCar->purchase_price ?? 0),
+                ];
+            });
+
+        // Sales summary for the period
+        $totalRecentSales = SoldCar::where('sold_at', '>=', Carbon::now()->subDays(30))->count();
+        $totalRecentRevenue = SoldCar::where('sold_at', '>=', Carbon::now()->subDays(30))->sum('sale_price');
+        $avgSalePrice = $totalRecentSales > 0 ? round($totalRecentRevenue / $totalRecentSales, 0) : 0;
+
+        return [
+            'recent_sales' => $recentSales,
+            'total_recent_sales' => $totalRecentSales,
+            'total_recent_revenue' => $totalRecentRevenue,
+            'avg_sale_price' => $avgSalePrice,
+        ];
+    }
+
+    private function getPendingDeliveries()
+    {
+        // Sales that are paid but not yet delivered
+        $pendingDeliveries = Sale::with(['car', 'customer'])
+            ->where('payment_status', 'paid')
+            ->whereIn('status', ['contract_signed', 'ready_for_delivery'])
+            ->orderBy('delivery_date')
+            ->get()
+            ->map(function($sale) {
+                return [
+                    'id' => $sale->id,
+                    'license_plate' => $sale->car->license_plate ?? 'Onbekend',
+                    'brand_model' => ($sale->car->brand ?? '') . ' ' . ($sale->car->model ?? ''),
+                    'customer_name' => $sale->customer->name ?? 'Onbekend',
+                    'sale_price' => $sale->sale_price,
+                    'delivery_date' => $sale->delivery_date,
+                    'status' => $sale->status,
+                    'days_overdue' => $sale->delivery_date && $sale->delivery_date < now() ? now()->diffInDays($sale->delivery_date) : 0,
+                ];
+            });
+
+        return [
+            'pending_deliveries' => $pendingDeliveries,
+            'total_pending' => $pendingDeliveries->count(),
+            'overdue_count' => $pendingDeliveries->where('days_overdue', '>', 0)->count(),
+        ];
     }
 }

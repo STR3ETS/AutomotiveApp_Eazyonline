@@ -81,7 +81,7 @@
                                          id="image-{{ $image->id }}">
                                     
                                     <!-- Selection Overlay -->
-                                    <div class="absolute inset-0 bg-[var(--status-info)] bg-opacity-0 rounded-lg flex items-center justify-center transition-all duration-200" 
+                                    <div class="absolute inset-0 bg-[var(--status-info)]/0 rounded-lg flex items-center justify-center transition-all duration-200" 
                                          id="overlay-{{ $image->id }}">
                                         <i class="fa-solid fa-check text-white text-xl opacity-0 transition-opacity duration-200" 
                                            id="check-{{ $image->id }}"></i>
@@ -346,25 +346,27 @@ function toggleImageSelection(imageId) {
     const image = document.getElementById(`image-${imageId}`);
     const overlay = document.getElementById(`overlay-${imageId}`);
     const check = document.getElementById(`check-${imageId}`);
-    
+
     if (selectedImages.includes(imageId)) {
         // Deselect
         selectedImages = selectedImages.filter(id => id !== imageId);
         image.classList.remove('border-blue-500');
-        overlay.classList.remove('bg-opacity-30');
+        overlay.classList.remove('bg-[var(--status-info)]/30');
+        overlay.classList.add('bg-[var(--status-info)]/0');
         check.classList.remove('opacity-100');
     } else {
         // Select (max 10 images)
         if (selectedImages.length < 10) {
             selectedImages.push(imageId);
             image.classList.add('border-blue-500');
-            overlay.classList.add('bg-opacity-30');
+            overlay.classList.remove('bg-[var(--status-info)]/0');
+            overlay.classList.add('bg-[var(--status-info)]/30');
             check.classList.add('opacity-100');
         } else {
             alert('Maximaal 10 foto\'s kunnen worden geselecteerd');
         }
     }
-    
+
     updateSelectedImagesPreview();
 }
 
@@ -391,28 +393,29 @@ function quickPublish(platform) {
         // Auto-select primary image or first few images
         const images = @json($car->images->take(5)->pluck('id'));
         selectedImages = images;
-        
+
         // Update UI
         images.forEach(imageId => {
             const image = document.getElementById(`image-${imageId}`);
             const overlay = document.getElementById(`overlay-${imageId}`);
             const check = document.getElementById(`check-${imageId}`);
-            
+
             if (image) {
                 image.classList.add('border-blue-500');
-                overlay.classList.add('bg-opacity-30');
+                overlay.classList.remove('bg-[var(--status-info)]/0');
+                overlay.classList.add('bg-[var(--status-info)]/30');
                 check.classList.add('opacity-100');
             }
         });
     }
-    
+
     const formData = new FormData();
     formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
     const templateSelect = document.getElementById('templateSelect');
-formData.append('template_id', templateSelect ? templateSelect.value : 1);
+    formData.append('template_id', templateSelect ? templateSelect.value : 1);
     formData.append('platform', platform);
     selectedImages.forEach(id => formData.append('image_ids[]', id));
-    
+
     publishListing(formData);
 }
 

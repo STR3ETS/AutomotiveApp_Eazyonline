@@ -7,6 +7,28 @@
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900 mb-2">📊 Bedrijfsrapportage</h1>
             <p class="text-gray-600">Compleet overzicht van je automotive business prestaties</p>
+            
+            <!-- Quick Summary Bar -->
+            <div class="mt-6 bg-gradient-to-r from-blue-600 via-purple-600 to-green-600 rounded-2xl p-6 text-white">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="text-center">
+                        <div class="text-2xl md:text-3xl font-bold number-highlight text-white">{{ $recentSalesData['total_recent_sales'] }}</div>
+                        <div class="text-sm opacity-90">Verkopen (30d)</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl md:text-3xl font-bold number-highlight text-white">€{{ number_format($kpis['revenue_this_month'] / 1000, 0) }}k</div>
+                        <div class="text-sm opacity-90">Omzet Deze Maand</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl md:text-3xl font-bold number-highlight text-white">{{ $kpis['active_repairs'] }}</div>
+                        <div class="text-sm opacity-90">Actieve Reparaties</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl md:text-3xl font-bold number-highlight text-white">{{ $customerData['conversion_rate'] }}%</div>
+                        <div class="text-sm opacity-90">Conversie Ratio</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- KPI Cards -->
@@ -104,7 +126,7 @@
                                 <span class="text-sm text-gray-500">{{ $stage['count'] }} auto's</span>
                             </div>
                             <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-blue-600 h-2 rounded-full transition-all duration-500" 
+                                <div class="progress-bar h-2 rounded-full transition-all duration-500" 
                                      style="width: {{ $stage['percentage'] }}%"></div>
                             </div>
                             <div class="text-right text-xs text-gray-500 mt-1">{{ $stage['percentage'] }}%</div>
@@ -123,11 +145,11 @@
                             $height = $maxRevenue > 0 ? ($month->revenue / $maxRevenue) * 100 : 0;
                         @endphp
                         <div class="flex flex-col items-center">
-                            <div class="bg-green-500 rounded-t w-12 transition-all duration-500" 
+                            <div class="bg-gradient-to-t from-green-600 to-green-400 rounded-t chart-bar w-12 transition-all duration-500" 
                                  style="height: {{ $height }}%"
                                  title="€{{ number_format($month->revenue, 0, ',', '.') }}"></div>
-                            <div class="text-xs text-gray-500 mt-2">{{ date('M', mktime(0, 0, 0, $month->month, 1)) }}</div>
-                            <div class="text-xs text-gray-400">{{ $month->sales_count }}</div>
+                            <div class="text-xs text-gray-500 mt-2 font-medium">{{ date('M', mktime(0, 0, 0, $month->month, 1)) }}</div>
+                            <div class="text-xs text-gray-400">{{ $month->sales_count }} 🚗</div>
                         </div>
                     @endforeach
                 </div>
@@ -256,6 +278,146 @@
             </div>
         </div>
 
+        <!-- Pending Deliveries Alert -->
+        @if($pendingDeliveries['total_pending'] > 0)
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-8">
+            <div class="flex items-center mb-4">
+                <div class="flex-shrink-0">
+                    <i class="fa-solid fa-truck text-amber-600 text-xl"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-lg font-semibold text-amber-800">⚠️ Wachtende Afleveringen</h3>
+                    <p class="text-amber-700">Er zijn {{ $pendingDeliveries['total_pending'] }} volledig betaalde auto's die nog moeten worden afgeleverd.</p>
+                    @if($pendingDeliveries['overdue_count'] > 0)
+                        <p class="text-red-600 font-medium">{{ $pendingDeliveries['overdue_count'] }} daarvan zijn te laat!</p>
+                    @endif
+                </div>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-amber-200">
+                    <thead class="bg-amber-100">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">Auto</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">Klant</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">Afleverdatum</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">Acties</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-amber-200">
+                        @foreach($pendingDeliveries['pending_deliveries'] as $delivery)
+                            <tr class="table-hover {{ $delivery['days_overdue'] > 0 ? 'alert-pulse' : '' }}">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">{{ $delivery['license_plate'] }}</div>
+                                    <div class="text-sm text-gray-500">{{ $delivery['brand_model'] }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {{ $delivery['customer_name'] }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @if($delivery['status'] === 'contract_signed')
+                                        <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">Contract Getekend</span>
+                                    @elseif($delivery['status'] === 'ready_for_delivery')
+                                        <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Klaar voor Aflevering</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    @if($delivery['delivery_date'])
+                                        <div class="{{ $delivery['days_overdue'] > 0 ? 'text-red-600 font-bold' : 'text-gray-900' }}">
+                                            {{ \Carbon\Carbon::parse($delivery['delivery_date'])->format('d-m-Y') }}
+                                        </div>
+                                        @if($delivery['days_overdue'] > 0)
+                                            <div class="text-xs text-red-500 font-medium">{{ $delivery['days_overdue'] }} dagen te laat ⚠️</div>
+                                        @endif
+                                    @else
+                                        <span class="text-gray-400">Geen datum gepland</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <a href="{{ route('sales.show', $delivery['id']) }}" 
+                                       class="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors duration-200">
+                                       Bekijk →
+                                    </a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @endif
+
+        <!-- Recent Sales Overview -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">🚗 Recente Verkopen (Afgelopen 30 dagen)</h3>
+                <div class="flex space-x-4 text-sm">
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-green-600">{{ $recentSalesData['total_recent_sales'] }}</p>
+                        <p class="text-gray-600">Verkocht</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-blue-600">€{{ number_format($recentSalesData['total_recent_revenue'], 0, ',', '.') }}</p>
+                        <p class="text-gray-600">Omzet</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-purple-600">€{{ number_format($recentSalesData['avg_sale_price'], 0, ',', '.') }}</p>
+                        <p class="text-gray-600">Gem. Prijs</p>
+                    </div>
+                </div>
+            </div>
+            
+            @if($recentSalesData['recent_sales']->count() > 0)
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Auto</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Klant</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Verkoopprijs</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Winst</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Verkocht op</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            @foreach($recentSalesData['recent_sales'] as $sale)
+                                <tr class="table-hover">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">{{ $sale['license_plate'] }}</div>
+                                        <div class="text-sm text-gray-500">{{ $sale['brand_model'] }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        {{ $sale['customer_name'] }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        €{{ number_format($sale['sale_price'], 0, ',', '.') }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        @if($sale['profit'] > 0)
+                                            <span class="text-green-600 font-semibold">+€{{ number_format($sale['profit'], 0, ',', '.') }}</span>
+                                        @elseif($sale['profit'] < 0)
+                                            <span class="text-red-600 font-semibold">-€{{ number_format(abs($sale['profit']), 0, ',', '.') }}</span>
+                                        @else
+                                            <span class="text-gray-500">€0</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {{ $sale['sold_at']->format('d-m-Y H:i') }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <div class="text-center py-8">
+                    <p class="text-gray-500">Geen recente verkopen gevonden.</p>
+                    <p class="text-sm text-gray-400">Verkoop een auto om deze sectie te vullen!</p>
+                </div>
+            @endif
+        </div>
+
         <!-- Stage Completion Overview -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">✅ Fase Voltooiing Overzicht</h3>
@@ -309,6 +471,16 @@
     to { transform: translateY(0); opacity: 1; }
 }
 
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
 .bg-white {
     animation: slideIn 0.5s ease-out;
 }
@@ -318,6 +490,48 @@
     transform: translateY(-2px);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
+}
+
+/* Progressive bar animation */
+.progress-bar {
+    background: linear-gradient(45deg, #3B82F6, #10B981);
+    transition: width 1s ease-in-out;
+}
+
+/* Alert pulse animation for overdue items */
+.alert-pulse {
+    animation: pulse 2s infinite;
+}
+
+/* Monthly chart bars */
+.chart-bar {
+    transition: all 0.3s ease;
+    border-radius: 4px 4px 0 0;
+}
+
+.chart-bar:hover {
+    transform: scaleY(1.1);
+    filter: brightness(1.1);
+}
+
+/* KPI cards gradient backgrounds */
+.kpi-blue { background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%); }
+.kpi-green { background: linear-gradient(135deg, #10B981 0%, #059669 100%); }
+.kpi-yellow { background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); }
+.kpi-orange { background: linear-gradient(135deg, #F97316 0%, #EA580C 100%); }
+
+/* Table hover effects */
+.table-hover:hover {
+    background: linear-gradient(45deg, rgba(59, 130, 246, 0.05), rgba(16, 185, 129, 0.05));
+}
+
+/* Add some sparkle to numbers */
+.number-highlight {
+    background: linear-gradient(45deg, #3B82F6, #10B981);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: bold;
 }
 </style>
 @endsection
