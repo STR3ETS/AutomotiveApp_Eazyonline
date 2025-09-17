@@ -175,27 +175,27 @@
                                            title="Bewerken">
                                             <i class="fa-solid fa-edit mr-1"></i> Bewerk
                                         </a>
-                                        @if($car->images->count() > 0)
-                                            <span class="inline-flex items-center px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium" title="{{ $car->images->count() }} foto's">
-                                                <i class="fa-solid fa-images mr-1"></i> {{ $car->images->count() }}
-                                            </span>
-                                        @else
-                                            <span class="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-500 rounded-full text-xs font-medium" title="Geen foto's">
-                                                <i class="fa-solid fa-image mr-1"></i> 0
-                                            </span>
-                                        @endif
                                         <form method="POST" 
-                                              action="{{ route('autos.destroy', $car) }}" 
-                                              class="inline"
-                                              onsubmit="return confirm('Weet je zeker dat je deze auto wilt verwijderen?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" 
-                                                    class="inline-flex items-center px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium hover:bg-red-200 transition-all duration-200"
-                                                    title="Verwijderen">
-                                                <i class="fa-solid fa-trash mr-1"></i> Verwijder
-                                            </button>
-                                        </form>
+                                        action="{{ route('autos.destroy', $car) }}" 
+                                        class="inline"
+                                        onsubmit="return confirm('Weet je zeker dat je deze auto wilt verwijderen?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" 
+                                        class="inline-flex items-center px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium hover:bg-red-200 transition-all duration-200"
+                                        title="Verwijderen">
+                                        <i class="fa-solid fa-trash mr-1"></i> Verwijder
+                                    </button>
+                                </form>
+                                @if($car->images->count() > 0)
+                                    <span class="inline-flex items-center px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium" title="{{ $car->images->count() }} foto's">
+                                        <i class="fa-solid fa-images mr-1"></i> {{ $car->images->count() }}
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-500 rounded-full text-xs font-medium" title="Geen foto's">
+                                        <i class="fa-solid fa-image mr-1"></i> 0
+                                    </span>
+                                @endif
                                     </td>
                                 </tr>
                             @endforeach
