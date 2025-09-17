@@ -44,6 +44,7 @@ Route::middleware(['auth', 'tenant'])->group(function () {
 
     // Auto management
     Route::resource('autos', AutoController::class);
+    Route::get('/rdw-data', [AutoController::class, 'getRdwData'])->name('autos.rdw-data');
 
     // Pipeline
     Route::get('/pipeline', [PipelineController::class, 'index'])->name('pipeline.index');

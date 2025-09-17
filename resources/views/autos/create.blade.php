@@ -46,13 +46,23 @@
                         <label for="license_plate" class="block text-sm font-medium text-gray-700 mb-2">
                             Kenteken <span class="text-red-500">*</span>
                         </label>
-                        <input type="text" 
-                               id="license_plate" 
-                               name="license_plate" 
-                               value="{{ old('license_plate') }}"
-                               placeholder="XX-XXX-X"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('license_plate') border-red-500 @enderror"
-                               required>
+                        <div class="relative">
+                            <input type="text" 
+                                   id="license_plate" 
+                                   name="license_plate" 
+                                   value="{{ old('license_plate') }}"
+                                   placeholder="XX-XXX-X"
+                                   class="w-full px-4 py-2 pr-24 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('license_plate') border-red-500 @enderror"
+                                   required>
+                            <button type="button" 
+                                    onclick="lookupRdwData()"
+                                    id="rdw-lookup-btn"
+                                    class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm font-medium transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                                <i class="fa-solid fa-search mr-1"></i>
+                                RDW
+                            </button>
+                        </div>
+                        <div id="rdw-status" class="mt-1 text-sm hidden"></div>
                         @error('license_plate')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -474,6 +484,159 @@ document.querySelector('form').addEventListener('submit', function(e) {
     const submitBtn = document.getElementById('submitBtn');
     submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Bezig met opslaan...';
     submitBtn.disabled = true;
+});
+
+// Test functie om te controleren of JavaScript werkt
+function testRdwButton() {
+    alert('RDW button clicked!');
+    console.log('Test functie werkt');
+}
+
+// RDW Lookup functionaliteit
+function lookupRdwData() {
+    console.log('RDW lookup functie aangeroepen');
+    
+    const kentekenInput = document.getElementById('license_plate');
+    const rdwBtn = document.getElementById('rdw-lookup-btn');
+    const statusDiv = document.getElementById('rdw-status');
+    
+    console.log('Elements gevonden:', {
+        kentekenInput: !!kentekenInput,
+        rdwBtn: !!rdwBtn,
+        statusDiv: !!statusDiv
+    });
+    
+    const kenteken = kentekenInput.value.trim();
+    console.log('Kenteken ingevoerd:', kenteken);
+    
+    // Validatie
+    if (!kenteken) {
+        showRdwStatus('Voer eerst een kenteken in', 'error');
+        return;
+    }
+    
+    // Kenteken opschonen (alleen letters en cijfers)
+    const cleanKenteken = kenteken.replace(/[^A-Z0-9]/gi, '').toUpperCase();
+    console.log('Opgeschoond kenteken:', cleanKenteken);
+    
+    if (cleanKenteken.length < 4 || cleanKenteken.length > 8) {
+        showRdwStatus('Kenteken moet tussen 4 en 8 tekens lang zijn', 'error');
+        return;
+    }
+    
+    // UI updates tijdens loading
+    rdwBtn.disabled = true;
+    rdwBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Ophalen...';
+    showRdwStatus('Gegevens ophalen van RDW...', 'loading');
+    
+    const apiUrl = `{{ route('autos.rdw-data') }}?kenteken=${encodeURIComponent(cleanKenteken)}`;
+    console.log('API URL:', apiUrl);
+    
+    // API call
+    fetch(apiUrl)
+        .then(response => {
+            console.log('Response status:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('RDW API response:', data);
+            
+            if (data.success) {
+                // Auto-fill form fields met correcte IDs
+                if (data.merk) {
+                    const merkField = document.getElementById('brand');
+                    if (merkField) {
+                        merkField.value = data.merk;
+                        console.log('Merk ingevuld:', data.merk);
+                    }
+                }
+                if (data.model) {
+                    const modelField = document.getElementById('model');
+                    if (modelField) {
+                        modelField.value = data.model;
+                        console.log('Model ingevuld:', data.model);
+                    }
+                }
+                if (data.bouwjaar) {
+                    const bouwjaarField = document.getElementById('year');
+                    if (bouwjaarField) {
+                        bouwjaarField.value = data.bouwjaar;
+                        console.log('Bouwjaar ingevuld:', data.bouwjaar);
+                    }
+                }
+                if (data.voertuigsoort) {
+                    // Probeer voertuigsoort te matchen met select opties
+                    const voertuigselectElement = document.getElementById('stage_id');
+                    if (voertuigselectElement) {
+                        const options = voertuigselectElement.options;
+                        for (let i = 0; i < options.length; i++) {
+                            if (options[i].text.toLowerCase().includes(data.voertuigsoort.toLowerCase())) {
+                                voertuigselectElement.selectedIndex = i;
+                                console.log('Voertuigsoort gematcht:', data.voertuigsoort);
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                // Update kenteken field met opgeschoond kenteken
+                kentekenInput.value = cleanKenteken;
+                
+                showRdwStatus(`Gegevens succesvol opgehaald voor ${cleanKenteken}`, 'success');
+            } else {
+                console.log('RDW lookup failed:', data.message);
+                showRdwStatus(data.message || 'Geen gegevens gevonden voor dit kenteken', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('RDW lookup error:', error);
+            showRdwStatus('Er is een fout opgetreden bij het ophalen van gegevens', 'error');
+        })
+        .finally(() => {
+            // Reset button
+            rdwBtn.disabled = false;
+            rdwBtn.innerHTML = '<i class="fa-solid fa-search mr-1"></i>RDW';
+        });
+}
+
+function showRdwStatus(message, type) {
+    const statusDiv = document.getElementById('rdw-status');
+    statusDiv.style.display = 'block';
+    statusDiv.className = 'mt-2 p-2 rounded text-sm';
+    
+    switch (type) {
+        case 'success':
+            statusDiv.className += ' bg-green-100 text-green-800 border border-green-200';
+            break;
+        case 'error':
+            statusDiv.className += ' bg-red-100 text-red-800 border border-red-200';
+            break;
+        case 'loading':
+            statusDiv.className += ' bg-blue-100 text-blue-800 border border-blue-200';
+            break;
+    }
+    
+    statusDiv.textContent = message;
+    
+    // Auto-hide success/error messages after 5 seconds
+    if (type !== 'loading') {
+        setTimeout(() => {
+            statusDiv.style.display = 'none';
+        }, 5000);
+    }
+}
+
+// Enter key support for kenteken field
+document.addEventListener('DOMContentLoaded', function() {
+    const kentekenInput = document.getElementById('license_plate');
+    if (kentekenInput) {
+        kentekenInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                lookupRdwData();
+            }
+        });
+    }
 });
 </script>
 @endsection

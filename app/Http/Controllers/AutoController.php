@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\CarImageController;
+use Illuminate\Support\Facades\Http;
 
 class AutoController extends Controller
 {
@@ -201,5 +202,80 @@ return redirect()->route('autos.show', $auto)
             ->get();
 
         return response()->json($cars);
+    }
+
+    /**
+     * Haal voertuiggegevens op van RDW Open Data API
+     */
+    public function getRdwData(Request $request)
+    {
+        $request->validate([
+            'kenteken' => 'required|string|min:4|max:10'
+        ]);
+
+        $kenteken = strtoupper(str_replace('-', '', $request->kenteken));
+        
+        try {
+            Log::info("RDW API request voor kenteken: {$kenteken}");
+            
+            // RDW Open Data API aanroepen
+            $response = Http::timeout(10)
+                ->get('https://opendata.rdw.nl/resource/m9d7-ebf2.json', [
+                    'kenteken' => $kenteken
+                ]);
+
+            if (!$response->successful()) {
+                Log::error("RDW API error: HTTP {$response->status()}");
+                return response()->json([
+                    'success' => false,
+                    'message' => 'RDW service tijdelijk niet beschikbaar'
+                ], 500);
+            }
+
+            $data = $response->json();
+            
+            if (empty($data)) {
+                Log::warning("Kenteken niet gevonden: {$kenteken}");
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Kenteken niet gevonden in RDW database'
+                ], 404);
+            }
+
+            $vehicleData = $data[0]; // Eerste resultaat pakken
+            
+            // Bouwjaar uit datum_eerste_toelating halen
+            $bouwjaar = null;
+            if (isset($vehicleData['datum_eerste_toelating'])) {
+                $bouwjaar = (int) substr($vehicleData['datum_eerste_toelating'], 0, 4);
+            }
+
+            // Response data structureren - platte structuur voor makkelijker gebruik in JavaScript
+            $result = [
+                'success' => true,
+                'merk' => $vehicleData['merk'] ?? null,
+                'model' => $vehicleData['handelsbenaming'] ?? $vehicleData['type'] ?? null,
+                'bouwjaar' => $bouwjaar,
+                'voertuigsoort' => $vehicleData['voertuigsoort'] ?? null,
+                'kenteken' => $kenteken,
+                // Extra nuttige data
+                'kleur' => $vehicleData['eerste_kleur'] ?? null,
+                'brandstof' => $vehicleData['brandstof_omschrijving'] ?? null,
+                'aantal_zitplaatsen' => $vehicleData['aantal_zitplaatsen'] ?? null,
+                'massa_ledig_voertuig' => $vehicleData['massa_ledig_voertuig'] ?? null
+            ];
+
+            Log::info("RDW data succesvol opgehaald", $result);
+            
+            return response()->json($result);
+
+        } catch (\Exception $e) {
+            Log::error("RDW API exception: " . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Er is een fout opgetreden bij het ophalen van voertuiggegevens'
+            ], 500);
+        }
     }
 }
