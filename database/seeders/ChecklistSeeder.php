@@ -19,35 +19,35 @@ class ChecklistSeeder extends Seeder
         $cars = Car::all();
 
         $defaultTasks = [
-            'Intake & Juridisch' => [
+            'Intake' => [
                 'Kenteken controleren',
                 'Eigendomspapieren verifiëren', 
                 'APK-status checken',
                 'Sleutels ontvangen en tellen',
                 'Schade-inspectie uitvoeren'
             ],
-            'Technische Intake' => [
+            'Technische controle' => [
                 'Volledige technische inspectie',
                 'Olie en vloeistoffen controleren',
                 'Remmen en banden checken',
                 'Motor- en transmissie test',
                 'Elektronica en verlichting testen'
             ],
-            'Commercieel Gereed' => [
+            'Herstel & Onderhoud' => [
+                'Reparaties plannen en uitvoeren',
+                'Onderdelen bestellen',
+                'Werkuren bijhouden',
+                'Kwaliteitscontrole reparaties',
+                'Kostenberekening finaliseren'
+            ],
+            'Commercieel gereed' => [
                 'Auto volledig schoonmaken',
                 'Professionele foto\'s maken',
                 'Advertentie tekst opstellen',
                 'Prijs bepalen en valideren',
                 'Online plaatsen op verkoopplatforms'
             ],
-            'Proefrit & Verzekering' => [
-                'Proefrit regelen en begeleiden',
-                'Verzekeringspapieren voorbereiden',
-                'Financiering opties bespreken',
-                'Aankoopcontract opstellen',
-                'Garantievoorwaarden uitleggen'
-            ],
-            'Verkoop Klaar' => [
+            'Verkoop klaar' => [
                 'Finale administratie afhandelen',
                 'Overdracht plannen met klant',
                 'Auto voorbereiden voor aflevering',
@@ -66,6 +66,7 @@ class ChecklistSeeder extends Seeder
                             'task' => $task,
                         ], [
                             'is_completed' => false,
+                            'company_id' => $car->company_id,
                         ]);
                     }
                 }

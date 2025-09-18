@@ -6,6 +6,7 @@ use App\Models\Car;
 use App\Models\CarStage;
 use Illuminate\Http\Request;
 use App\Models\Checklist;
+use Illuminate\Support\Facades\Log;
 
 class PipelineController extends Controller
 {
@@ -17,11 +18,16 @@ class PipelineController extends Controller
         foreach ($stages as $stage) {
             foreach ($stage->cars as $car) {
                 $this->ensureChecklistsExist($car, $stage);
+                
+                // Sync status met stage naam als het niet klopt
+                if ($car->status !== $stage->name) {
+                    $car->update(['status' => $stage->name]);
+                }
             }
         }
         
         // Zorg ook dat auto's die niet in een specifieke stage staan, toch checklists hebben
-        $allCars = \App\Models\Car::all();
+        $allCars = Car::all();
         foreach ($allCars as $car) {
             foreach ($stages as $stage) {
                 $this->ensureChecklistsExist($car, $stage);
@@ -43,7 +49,7 @@ class PipelineController extends Controller
         $targetStage = CarStage::findOrFail($request->stage_id);
         $currentStage = $car->stage;
 
-        // Check of de auto mag worden verplaatst
+        // Check of de auto mag worden verplaatst naar een volgende fase
         if ($currentStage && !$car->canMoveToNextStage() && $targetStage->order > $currentStage->order) {
             // Debug informatie
             $checklists = $car->checklists()->where('stage_id', $car->stage_id)->get();
@@ -52,7 +58,7 @@ class PipelineController extends Controller
             
             return response()->json([
                 'success' => false, 
-                'message' => "Voltooi eerst alle taken in de huidige fase voordat je de auto kunt verplaatsen. ({$completed}/{$total} voltooid)",
+                'message' => "Voltooi eerst alle taken in '{$currentStage->name}' voordat je de auto kunt verplaatsen naar '{$targetStage->name}'. ({$completed}/{$total} voltooid)",
                 'debug' => [
                     'car_id' => $car->id,
                     'current_stage' => $currentStage->name,
@@ -60,18 +66,18 @@ class PipelineController extends Controller
                     'completed_tasks' => $completed,
                     'total_tasks' => $total,
                     'can_move' => $car->canMoveToNextStage(),
-                    'completion' => $car->stage_completion
                 ]
             ], 422);
         }
 
-        // Update car stage
-        $car->stage_id = $request->stage_id;
+        // Sla de oude stage op voor logging
+        $oldStage = $currentStage ? $currentStage->name : 'Geen stage';
         
-        // Update car status based on stage - use exact stage names
-        $car->status = $targetStage->name;
-        
-        $car->save();
+        // Update beide stage_id en status in één keer
+        $car->update([
+            'stage_id' => $request->stage_id,
+            'status' => $targetStage->name
+        ]);
 
         // Maak checklist taken aan voor ALLE stages, niet alleen de nieuwe
         $allStages = CarStage::all();
@@ -79,7 +85,26 @@ class PipelineController extends Controller
             $this->ensureChecklistsExist($car, $stage);
         }
 
-        return response()->json(['success' => true]);
+        // Log de verandering voor debugging
+        Log::info("Auto {$car->license_plate} verplaatst van '{$oldStage}' naar '{$targetStage->name}'", [
+            'car_id' => $car->id,
+            'old_stage' => $oldStage,
+            'new_stage' => $targetStage->name,
+            'old_stage_id' => $currentStage ? $currentStage->id : null,
+            'new_stage_id' => $targetStage->id
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => "Auto {$car->license_plate} succesvol verplaatst naar {$targetStage->name}",
+            'car' => [
+                'id' => $car->id,
+                'license_plate' => $car->license_plate,
+                'old_stage' => $oldStage,
+                'new_stage' => $targetStage->name,
+                'new_status' => $car->status
+            ]
+        ]);
     }
 
     // Zorg ervoor dat checklist taken bestaan voor een auto in een specifieke stage
@@ -130,6 +155,15 @@ class PipelineController extends Controller
         $checklist->update([
             'is_completed' => $request->is_completed
         ]);
+        
+        // Als deze checklist gekoppeld is aan een reparatie en wordt afgevinkt, 
+        // zet de reparatie op "gereed"
+        if ($checklist->repair_id && $request->is_completed) {
+            $repair = $checklist->repair;
+            if ($repair && $repair->status !== 'gereed') {
+                $repair->update(['status' => 'gereed']);
+            }
+        }
 
         $car = $checklist->car;
         $completion = $car->stage_completion;

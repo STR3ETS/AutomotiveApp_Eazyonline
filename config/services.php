@@ -35,4 +35,28 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | External API Integrations
+    |--------------------------------------------------------------------------
+    */
+
+    'marketplace' => [
+        'base_url' => env('MARKETPLACE_BASE_URL', 'https://api.marketplace.example.com'),
+        'client_id' => env('MARKETPLACE_CLIENT_ID'),
+        'client_secret' => env('MARKETPLACE_CLIENT_SECRET'),
+        'redirect_uri' => env('MARKETPLACE_REDIRECT_URI'),
+        'scope' => env('MARKETPLACE_SCOPE', 'read write'),
+        'sandbox' => env('MARKETPLACE_SANDBOX', true),
+        'mock' => env('MARKETPLACE_MOCK', true),
+        'auth_url' => env('MARKETPLACE_AUTH_URL', '/oauth/authorize'),
+        'token_url' => env('MARKETPLACE_TOKEN_URL', '/oauth/token'),
+    ],
+
+    'ga4' => [
+        'property_id' => env('GA4_PROPERTY_ID'),
+        'credentials_path' => env('GA4_CREDENTIALS', 'storage/app/ga4.json'),
+        'mock' => env('GA4_MOCK', true),
+    ],
+
 ];

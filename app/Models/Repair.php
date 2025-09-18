@@ -2,17 +2,21 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToCompany;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Repair extends Model
 {
+    use BelongsToCompany;
+    
     protected $fillable = [
         'car_id',
         'description',
         'status',
         'cost_estimate',
+        'company_id',
     ];
 
     public function car(): BelongsTo
@@ -23,6 +27,11 @@ class Repair extends Model
     public function parts(): HasMany
     {
         return $this->hasMany(Part::class);
+    }
+    
+    public function checklist()
+    {
+        return $this->hasOne(Checklist::class);
     }
 
     // Handige accessor: totale onderdelenkosten

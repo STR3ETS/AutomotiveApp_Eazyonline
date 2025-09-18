@@ -4,52 +4,219 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AutoController;
 use App\Http\Controllers\PipelineController;
 use App\Http\Controllers\DashboardController;
-use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
+use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\RepairController;
 use App\Http\Controllers\SalesController;
+use App\Http\Controllers\SalesReadyController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ActiveSalesController;
+use App\Http\Controllers\SoldCarsController;
+use App\Http\Controllers\ReportsController;
+use App\Http\Controllers\TenantTestController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\CarImageController;
+use App\Http\Controllers\CarVideoController;
+use App\Http\Controllers\MarketplaceController;
+use Illuminate\Support\Facades\Auth;
 
-Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-Route::resource('autos', AutoController::class);
-Route::get('/pipeline', [PipelineController::class, 'index'])->name('pipeline.index');
-Route::post('/pipeline/move', [PipelineController::class, 'move'])->name('pipeline.move');
-Route::get('/pipeline/checklist/{car}', [PipelineController::class, 'showChecklist'])->name('pipeline.checklist');
-Route::put('/pipeline/checklist/{checklist}', [PipelineController::class, 'updateChecklistItem'])->name('pipeline.checklist.update');
+// Authentication routes (GEEN LOGIN VEREIST)
+Route::get('/login', [AuthController::class, 'showLogin'])->name('auth.login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
 
-// Debug route - tijdelijk
-Route::get('/debug/car/{car}', function(\App\Models\Car $car) {
-    $checklists = $car->checklists()->where('stage_id', $car->stage_id)->get();
-    return [
-        'car' => $car->license_plate,
-        'current_stage' => $car->stage->name,
-        'stage_id' => $car->stage_id,
-        'checklists' => $checklists->map(function($c) {
-            return [
-                'id' => $c->id,
-                'task' => $c->task,
-                'is_completed' => $c->is_completed,
-                'stage_id' => $c->stage_id
-            ];
-        }),
-        'completion' => $car->stage_completion,
-        'can_move' => $car->canMoveToNextStage()
-    ];
+// Redirect root to login
+Route::get('/', function () {
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }
+    return redirect()->route('auth.login');
+})->name('home');
+
+// Dynamic CSS route for companies (GEEN LOGIN VEREIST)
+Route::get('/css/company/{subdomain}.css', [ThemeController::class, 'generateCSS'])->name('company.css');
+
+// ALLE ANDERE ROUTES VEREISEN LOGIN
+Route::middleware(['auth', 'tenant'])->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Auto management
+    Route::resource('autos', AutoController::class);
+    Route::get('/rdw-data', [AutoController::class, 'getRdwData'])->name('autos.rdw-data');
+
+    // Pipeline
+    Route::get('/pipeline', [PipelineController::class, 'index'])->name('pipeline.index');
+    Route::post('/pipeline/move', [PipelineController::class, 'move'])->name('pipeline.move');
+    Route::get('/pipeline/checklist/{car}', [PipelineController::class, 'showChecklist'])->name('pipeline.checklist');
+    Route::put('/pipeline/checklist/{checklist}', [PipelineController::class, 'updateChecklistItem'])->name('pipeline.checklist.update');
+
+    // Agenda
+    Route::get('/agenda', [AgendaController::class, 'index'])->name('agenda.index');
+    Route::post('/agenda', [AgendaController::class, 'store'])->name('agenda.store');
+    Route::delete('/agenda/{id}', [AgendaController::class, 'destroy'])->name('agenda.destroy');
+
+    // Repairs
+    Route::get('/repairs', [RepairController::class, 'index'])->name('repairs.index');
+    Route::get('/repairs/create', [RepairController::class, 'create'])->name('repairs.create');
+    Route::post('/repairs', [RepairController::class, 'store'])->name('repairs.store');
+    Route::get('/repairs/analytics', [RepairController::class, 'analytics'])->name('repairs.analytics');
+    Route::get('/repairs/{repair}', [RepairController::class, 'show'])->name('repairs.show');
+    Route::get('/repairs/{repair}/edit', [RepairController::class, 'edit'])->name('repairs.edit');
+    Route::put('/repairs/{repair}', [RepairController::class, 'update'])->name('repairs.update');
+    Route::delete('/repairs/{repair}', [RepairController::class, 'destroy'])->name('repairs.destroy');
+
+    // Parts management
+    Route::get('/repairs/{repair}/parts', [RepairController::class, 'partsIndex'])->name('repairs.parts.index');
+    Route::post('/repairs/{repair}/parts', [RepairController::class, 'storePart'])->name('repairs.parts.store');
+    Route::put('/parts/{part}', [RepairController::class, 'updatePart'])->name('parts.update');
+    Route::delete('/parts/{part}', [RepairController::class, 'destroyPart'])->name('parts.destroy');
+
+    // Customers - Only owners
+    
+        Route::resource('customers', CustomerController::class);
+    
+
+    // Sales routes - Reports only for owners, but medewerkers can see basic sales status
+    Route::get('/verkoop-klaar', [SalesReadyController::class, 'index'])->name('sales-ready.index');
+    Route::get('/verkoop-klaar/{car}/pdf', [SalesReadyController::class, 'exportPdf'])->name('sales-ready.pdf');
+    Route::post('/verkoop-klaar/{car}/email', [SalesReadyController::class, 'sendEmailReport'])->name('sales-ready.email');
+    Route::get('/actieve-verkoop', [ActiveSalesController::class, 'index'])->name('active-sales.index');
+
+    // Sales management - Only owners
+    Route::resource('sales', SalesController::class);
+    Route::post('/sales/{sale}/deliver', [SalesController::class, 'markAsDelivered'])->name('sales.deliver');
+    Route::post('/sales/{sale}/cancel', [SalesController::class, 'cancel'])->name('sales.cancel');
+    Route::post('/sales/{sale}/payment', [SalesController::class, 'processPayment'])->name('sales.payment');
+
+    // Sold Cars - Only owners  
+    Route::get('/sold-cars', [SoldCarsController::class, 'index'])->middleware('can:view.reports')->name('sold-cars.index');
+    Route::get('/sold-cars/{soldCar}', [SoldCarsController::class, 'show'])->middleware('can:view.reports')->name('sold-cars.show');
+
+
+    // Employees - Position-based access
+    Route::get('/employees', [EmployeeController::class, 'index'])->middleware('can:manage.company')->name('employees.index');
+    Route::get('/employees/create', [EmployeeController::class, 'create'])->middleware('can:manage.company')->name('employees.create');
+    Route::post('/employees', [EmployeeController::class, 'store'])->middleware('can:manage.company')->name('employees.store');
+    Route::get('/employees/{employee}', [EmployeeController::class, 'show'])->name('employees.show'); // Everyone can view their own
+    Route::get('/employees/{employee}/edit', [EmployeeController::class, 'edit'])->middleware('can:manage.company')->name('employees.edit');
+    Route::put('/employees/{employee}', [EmployeeController::class, 'update'])->middleware('can:manage.company')->name('employees.update');
+    Route::delete('/employees/{employee}', [EmployeeController::class, 'destroy'])->middleware('can:manage.company')->name('employees.destroy');
+    Route::post('/employees/{employee}/assign-car', [EmployeeController::class, 'assignCar'])->middleware('can:assign.work')->name('employees.assign-car');
+    Route::post('/employees/{employee}/assignments/{assignment}/complete', [EmployeeController::class, 'completeAssignment'])->name('employees.complete-assignment');
+    Route::post('/employees/{employee}/assignments/{assignment}/cancel', [EmployeeController::class, 'cancelAssignment'])->middleware('can:assign.work')->name('employees.cancel-assignment');
+
+    // Car Images
+    Route::post('/cars/{car}/images', [CarImageController::class, 'store'])->name('cars.images.store');
+    Route::delete('/images/{carImage}', [CarImageController::class, 'destroy'])->name('cars.images.destroy');
+    Route::post('/images/{carImage}/make-primary', [CarImageController::class, 'makePrimary'])->name('cars.images.make-primary');
+    Route::post('/cars/{car}/images/reorder', [CarImageController::class, 'updateOrder'])->name('cars.images.reorder');
+
+    // Car Videos
+    Route::get('/cars/{car}/videos', [CarVideoController::class, 'index'])->name('cars.videos.index');
+    Route::post('/cars/{car}/videos', [CarVideoController::class, 'store'])->name('cars.videos.store');
+    Route::put('/cars/{car}/videos/{video}', [CarVideoController::class, 'update'])->name('cars.videos.update');
+    Route::delete('/cars/{car}/videos/{video}', [CarVideoController::class, 'destroy'])->name('cars.videos.destroy');
+    Route::post('/cars/{car}/videos/{video}/make-featured', [CarVideoController::class, 'makeFeatured'])->name('cars.videos.make-featured');
+    Route::post('/cars/{car}/videos/reorder', [CarVideoController::class, 'updateSortOrder'])->name('cars.videos.reorder');
+
+    // Marketplace Publishing
+    Route::get('/cars/{car}/marketplace', [MarketplaceController::class, 'show'])->name('cars.marketplace.show');
+    Route::post('/cars/{car}/marketplace/preview', [MarketplaceController::class, 'preview'])->name('cars.marketplace.preview');
+    Route::post('/cars/{car}/listings', [MarketplaceController::class, 'createListing'])->name('cars.listings.create');
+    Route::post('/listings/{listing}/publish', [MarketplaceController::class, 'publishListing'])->name('listings.publish');
+    Route::get('/listings/{listing}/preview', [MarketplaceController::class, 'previewListing'])->name('listings.preview');
+    Route::delete('/listings/{listing}', [MarketplaceController::class, 'deleteListing'])->name('listings.delete');
+
+    // Reports - Only owners
+    Route::get('/rapportage', [ReportsController::class, 'index'])->middleware('can:view.reports')->name('reports.index');
+
+    // Theme settings - Only owners
+    Route::get('/admin/theme', [ThemeController::class, 'showThemeSettings'])->middleware('can:manage.company')->name('admin.theme');
+    Route::post('/admin/theme', [ThemeController::class, 'updateThemeSettings'])->middleware('can:manage.company')->name('admin.theme.update');
+
+    // Company Settings - Only owners
+    Route::get('/company-settings', [App\Http\Controllers\CompanySettingsController::class, 'index'])->middleware('can:manage.company')->name('company-settings.index');
+    Route::put('/company-settings', [App\Http\Controllers\CompanySettingsController::class, 'update'])->middleware('can:manage.company')->name('company-settings.update');
+
+    // Tenant test routes (for testing only)
+    Route::get('/tenant-test', [TenantTestController::class, 'index'])->name('tenant.test');
+    Route::get('/set-tenant/{company}', [TenantTestController::class, 'setTenant'])->name('tenant.set');
 });
 
-Route::get('/agenda', [AgendaController::class, 'index'])->name('agenda.index');
-Route::post('/agenda', [AgendaController::class, 'store'])->name('agenda.store');
-Route::delete('/agenda/{id}', [AgendaController::class, 'destroy'])->name('agenda.destroy');
+// OAuth routes (outside auth middleware)
+Route::get('/oauth/marketplace/redirect', [App\Http\Controllers\MarketplaceAuthController::class, 'redirect'])
+    ->name('oauth.marketplace.redirect');
+Route::get('/oauth/marketplace/callback', [App\Http\Controllers\MarketplaceAuthController::class, 'callback'])
+    ->name('oauth.marketplace.callback');
 
+// API Integration routes (with tenant context)
+Route::middleware(['auth.simple', App\Http\Middleware\TenantContext::class])->group(function () {
+    // Listing publishing API
+    Route::post('/tenants/{tenant}/listings/{id}/publish', [App\Http\Controllers\ListingPublishController::class, 'publishListing'])
+        ->name('api.listings.publish');
 
-Route::get('/repairs', [RepairController::class, 'index'])->name('repairs.index');
-Route::post('/repairs', [RepairController::class, 'store'])->name('repairs.store');
-Route::put('/repairs/{repair}', [RepairController::class, 'update'])->name('repairs.update');
-Route::delete('/repairs/{repair}', [RepairController::class, 'destroy'])->name('repairs.destroy');
+    Route::get('/tenants/{tenant}/listings/{id}/status', [App\Http\Controllers\ListingPublishController::class, 'getListingStatus'])
+        ->name('api.listings.status');
 
-Route::post('/repairs/{repair}/parts', [RepairController::class, 'addPart'])->name('repairs.parts.store');
-Route::put('/parts/{part}', [RepairController::class, 'updatePart'])->name('parts.update');
+    // Analytics API
+    Route::get('/tenants/{tenant}/analytics/active-users', [App\Http\Controllers\ListingPublishController::class, 'getActiveUsers'])
+        ->name('api.analytics.active-users');
+});
 
-Route::resource('sales', SalesController::class);
-Route::post('/sales/{sale}/deliver', [SalesController::class, 'markAsDelivered'])->name('sales.deliver');
-Route::post('/sales/{sale}/cancel', [SalesController::class, 'cancel'])->name('sales.cancel');
-Route::put('/sales/checklist/{item}', [SalesController::class, 'toggleChecklistItem'])->name('sales.checklist.toggle');
+// TEST ROUTES - Remove in production
+Route::get('/test-marketplace', function () {
+    return view('test-marketplace');
+});
+
+Route::post('/test-marketplace/preview', function (Illuminate\Http\Request $request) {
+    $platform = $request->input('platform', 'marktplaats');
+    
+    // Mock car data
+    $carData = [
+        'brand' => 'BMW',
+        'model' => 'X5',
+        'year' => 2020,
+        'price' => 45000,
+        'mileage' => 75000
+    ];
+    
+    // Generate content based on platform
+    $platformTemplates = [
+        'marktplaats' => [
+            'title' => '{brand} {model} ({year}) - €{price}',
+            'description' => "Te koop: {brand} {model}\n\nBouwjaar: {year}\nKilometerstand: {mileage} km\nPrijs: €{price}\n\nDealer occasie met garantie!"
+        ],
+        'instagram' => [
+            'title' => '🚗 {brand} {model} | {year} | €{price}',
+            'description' => "🚗 {brand} {model} ({year})\n\n📍 Nu beschikbaar!\n🔥 {mileage}km | €{price}\n\n#bmw #x5 #auto #occasions"
+        ],
+        'facebook' => [
+            'title' => '{brand} {model} - {year} | {mileage}km',
+            'description' => "{brand} {model} te koop!\n\nBouwjaar: {year}\nKilometerstand: {mileage} km\nPrijs: €{price}\n\nBetrouwbare dealer!"
+        ]
+    ];
+    
+    $template = $platformTemplates[$platform] ?? $platformTemplates['marktplaats'];
+    
+    // Replace placeholders
+    $replacements = [
+        '{brand}' => $carData['brand'],
+        '{model}' => $carData['model'],
+        '{year}' => $carData['year'],
+        '{price}' => number_format($carData['price'], 0, ',', '.'),
+        '{mileage}' => number_format($carData['mileage'], 0, ',', '.')
+    ];
+    
+    $title = str_replace(array_keys($replacements), array_values($replacements), $template['title']);
+    $description = str_replace(array_keys($replacements), array_values($replacements), $template['description']);
+    
+    return response()->json([
+        'success' => true,
+        'platform' => $platform,
+        'title' => $title,
+        'description' => $description,
+        'car' => $carData
+    ]);
+});

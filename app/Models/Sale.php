@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToCompany;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Sale extends Model
 {
+    use BelongsToCompany;
+    
     protected $fillable = [
         'car_id',
         'customer_id',
@@ -18,6 +21,7 @@ class Sale extends Model
         'contract_signed_at',
         'delivery_date',
         'delivery_time',
+        'company_id',
         'notes',
         'sold_at',
     ];
