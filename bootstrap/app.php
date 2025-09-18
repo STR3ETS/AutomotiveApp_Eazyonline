@@ -14,8 +14,38 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'tenant' => \App\Http\Middleware\TenantMiddleware::class,
             'auth.simple' => \App\Http\Middleware\AuthMiddleware::class,
+            'handle403' => \App\Http\Middleware\Handle403Middleware::class,
+        ]);
+        
+        // Voeg 403 middleware toe aan alle web routes
+        $middleware->web(append: [
+            \App\Http\Middleware\Handle403Middleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (\Illuminate\Auth\Access\AuthorizationException $e, $request) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Je hebt geen toegang tot deze actie.',
+                    'redirect' => '/'
+                ], 403);
+            }
+
+            return redirect('/')
+                ->with('error', 'Je hebt geen toegang tot deze pagina. Je bent doorverwezen naar het dashboard.');
+        });
+
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpException $e, $request) {
+            if ($e->getStatusCode() === 403) {
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'message' => 'Je hebt geen toegang tot deze actie.',
+                        'redirect' => '/'
+                    ], 403);
+                }
+
+                return redirect('/')
+                    ->with('error', 'Je hebt geen toegang tot deze pagina. Je bent doorverwezen naar het dashboard.');
+            }
+        });
     })->create();
