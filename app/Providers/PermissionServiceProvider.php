@@ -14,7 +14,10 @@ class PermissionServiceProvider extends ServiceProvider
         Gate::define('manage.employees', fn($user) => $user->employee?->position === 'eigenaar');
         Gate::define('manage.cars', fn($user) => $user->employee?->position === 'eigenaar');
         Gate::define('view.reports', fn($user) => $user->employee?->position === 'eigenaar');
-        Gate::define('assign.cars', fn($user) => $user->employee?->position === 'eigenaar');
         Gate::define('manage.customers', fn($user) => $user->employee?->position === 'eigenaar');
+        
+        // Auto's toewijzen en werk toewijzen: eigenaar EN medewerker
+        Gate::define('assign.cars', fn($user) => in_array($user->employee?->position, ['eigenaar', 'medewerker']));
+        Gate::define('assign.work', fn($user) => in_array($user->employee?->position, ['eigenaar', 'medewerker']));
     }
 }
